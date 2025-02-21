@@ -1,8 +1,25 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
+import { useEffect, useState } from "react";
 
 export const Header = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    setIsLoggedIn(!!user);
+
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      const user = localStorage.getItem("user");
+      setIsLoggedIn(!!user);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   return (
     <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b">
       <div className="container mx-auto px-4">
@@ -27,12 +44,24 @@ export const Header = () => {
           </nav>
 
           <div className="flex items-center space-x-4">
-            <Button variant="outline" className="hidden md:inline-flex">
-              Login
-            </Button>
-            <Button className="bg-accent hover:bg-accent-hover">
-              Register
-            </Button>
+            {isLoggedIn ? (
+              <>
+                <Link to="/profile">
+                  <Button variant="outline">Profile</Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" className="hidden md:inline-flex">
+                    Login
+                  </Button>
+                </Link>
+                <Button className="bg-accent hover:bg-accent-hover">
+                  Register
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
