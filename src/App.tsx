@@ -11,6 +11,8 @@ import Notes from "./pages/Notes";
 import Courses from "./pages/Courses";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import AddNotes from "./pages/AddNotes";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/courses" element={<Courses />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/add-notes" element={<AddNotes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -5,15 +5,30 @@ import { useEffect, useState } from "react";
 
 export const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isTeacher, setIsTeacher] = useState(false);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-    setIsLoggedIn(!!user);
+    if (user) {
+      const userData = JSON.parse(user);
+      setIsLoggedIn(true);
+      setIsTeacher(userData.role === "teacher");
+    } else {
+      setIsLoggedIn(false);
+      setIsTeacher(false);
+    }
 
     // Listen for storage changes
     const handleStorageChange = () => {
       const user = localStorage.getItem("user");
-      setIsLoggedIn(!!user);
+      if (user) {
+        const userData = JSON.parse(user);
+        setIsLoggedIn(true);
+        setIsTeacher(userData.role === "teacher");
+      } else {
+        setIsLoggedIn(false);
+        setIsTeacher(false);
+      }
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -41,6 +56,11 @@ export const Header = () => {
             <Link to="/about" className="text-gray-600 hover:text-accent transition-colors">
               About Us
             </Link>
+            {isTeacher && (
+              <Link to="/add-notes" className="text-accent hover:text-accent-hover transition-colors">
+                Add Notes
+              </Link>
+            )}
           </nav>
 
           <div className="flex items-center space-x-4">
@@ -57,9 +77,11 @@ export const Header = () => {
                     Login
                   </Button>
                 </Link>
-                <Button className="bg-accent hover:bg-accent-hover">
-                  Register
-                </Button>
+                <Link to="/register">
+                  <Button className="bg-accent hover:bg-accent-hover">
+                    Register
+                  </Button>
+                </Link>
               </>
             )}
           </div>
