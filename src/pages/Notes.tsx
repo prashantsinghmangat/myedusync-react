@@ -10,8 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Board, DataStructure } from "@/types/notes";
+import { Board, DataStructure, Note } from "@/types/notes";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 const Notes = () => {
   const navigate = useNavigate();
@@ -19,43 +20,29 @@ const Notes = () => {
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
+  const { data: notes = [], isLoading } = useQuery({
+    queryKey: ['notes', selectedBoard, selectedClass, selectedSubject],
+    queryFn: async () => {
+      if (selectedBoard === "SelectBoard" || !selectedClass || !selectedSubject) {
+        return [];
+      }
+      const response = await fetch(
+        `https://www.myedusync.com/api/getNotesLists?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`
+      );
+      if (!response.ok) {
+        throw new Error('Failed to fetch notes');
+      }
+      return response.json();
+    },
+    enabled: selectedBoard !== "SelectBoard" && !!selectedClass && !!selectedSubject,
+  });
+
   const data: Record<Board, DataStructure> = {
     SelectBoard: createDataStructure(),
     CBSE: createDataStructure(),
     ICSE: createDataStructure(),
     UPBoard: createDataStructure(),
   };
-
-  // Mock notes data - in a real app, this would come from an API
-  const mockNotes = [
-    {
-      id: "1",
-      title: "Introduction to Chemistry",
-      description: "Basic concepts of atoms and molecules",
-      board: "CBSE",
-      class: 11,
-      subject: "Chemistry",
-      content: "Detailed content here...",
-      createdAt: "2024-03-20",
-    },
-    {
-      id: "2",
-      title: "Physics Mechanics",
-      description: "Newton's laws of motion",
-      board: "CBSE",
-      class: 11,
-      subject: "Physics",
-      content: "Detailed content here...",
-      createdAt: "2024-03-21",
-    },
-  ];
-
-  const filteredNotes = mockNotes.filter(
-    (note) =>
-      note.board === selectedBoard &&
-      note.class === selectedClass &&
-      note.subject === selectedSubject
-  );
 
   function createDataStructure(): DataStructure {
     return {
@@ -157,8 +144,10 @@ const Notes = () => {
           {/* Notes List */}
           {selectedSubject && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredNotes.length > 0 ? (
-                filteredNotes.map((note) => (
+              {isLoading ? (
+                <p className="col-span-full text-center text-gray-500">Loading notes...</p>
+              ) : notes.length > 0 ? (
+                notes.map((note: Note) => (
                   <Card
                     key={note.id}
                     className="cursor-pointer hover:shadow-lg transition-shadow"
