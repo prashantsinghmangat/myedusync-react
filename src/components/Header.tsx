@@ -41,7 +41,7 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/d614d6ff-c668-47c6-bdb5-60330a9e4cb3.png" 
+              src="/lovable-uploads/2557202f-2fb8-4411-aded-c15cc766021d.png" 
               alt="MyEduSync Logo" 
               className="h-8"
             />
