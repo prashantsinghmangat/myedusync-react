@@ -39,8 +39,12 @@ export const Header = () => {
     <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="text-2xl font-bold text-primary">
-            MyEduSync
+          <Link to="/" className="flex items-center space-x-2">
+            <img 
+              src="/lovable-uploads/d614d6ff-c668-47c6-bdb5-60330a9e4cb3.png" 
+              alt="MyEduSync Logo" 
+              className="h-8"
+            />
           </Link>
           
           <nav className="hidden md:flex items-center space-x-8">
@@ -52,6 +56,9 @@ export const Header = () => {
             </Link>
             <Link to="/courses" className="text-gray-600 hover:text-accent transition-colors">
               Courses
+            </Link>
+            <Link to="/blog" className="text-gray-600 hover:text-accent transition-colors">
+              Blog
             </Link>
             <Link to="/about" className="text-gray-600 hover:text-accent transition-colors">
               About Us
