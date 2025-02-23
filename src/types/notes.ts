@@ -9,12 +9,18 @@ export interface DataStructure {
 }
 
 export interface Note {
-  id: string;
+  _id: string;
   title: string;
-  description: string;
-  board: Board;
-  class: number;
-  subject: string;
-  content: string;
+  notesBoard: string;
+  notesClass: string;
+  notesSubject: string;
+  chapter: number;
+  featuredImage: string;
+  author: string;
+  authorId: string;
+  tags: string[];
   createdAt: string;
+  updatedAt: string;
+  notesStatus: string;
+  reviewBy: string;
 }
