@@ -11,10 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Simple validation
@@ -27,14 +28,49 @@ const Login = () => {
       return;
     }
 
-    // In a real app, this would be an API call
-    // For demo purposes, we'll just store in localStorage
-    localStorage.setItem("user", JSON.stringify({ email, isLoggedIn: true }));
-    toast({
-      title: "Success",
-      description: "You have successfully logged in",
-    });
-    navigate("/profile");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('https://api.myedusync.com/login', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer',
+        },
+        body: JSON.stringify({
+          emailId: email,
+          password: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store the token and user data
+      localStorage.setItem("user", JSON.stringify({
+        email,
+        isLoggedIn: true,
+        token: data.token
+      }));
+
+      toast({
+        title: "Success",
+        description: "You have successfully logged in",
+      });
+      navigate("/profile");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to login",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -49,10 +85,11 @@ const Login = () => {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -63,10 +100,15 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
+                  disabled={isLoading}
                 />
               </div>
-              <Button type="submit" className="w-full bg-accent hover:bg-accent-hover">
-                Login
+              <Button 
+                type="submit" 
+                className="w-full bg-accent hover:bg-accent-hover"
+                disabled={isLoading}
+              >
+                {isLoading ? "Logging in..." : "Login"}
               </Button>
             </form>
           </div>
