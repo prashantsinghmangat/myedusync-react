@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 const NoteDetail = () => {
   const { id } = useParams();
@@ -83,7 +84,7 @@ const NoteDetail = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Details</h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -94,7 +95,19 @@ const NoteDetail = () => {
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 mt-4">
+                <Separator />
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Content</h3>
+                  <div 
+                    className="prose max-w-none"
+                    dangerouslySetInnerHTML={{ __html: note.content }}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex flex-wrap gap-2">
                   {note.tags?.map((tag: string, index: number) => (
                     <span 
                       key={index}
@@ -105,7 +118,7 @@ const NoteDetail = () => {
                   ))}
                 </div>
 
-                <div className="mt-4 text-sm text-gray-500">
+                <div className="text-sm text-gray-500">
                   <p>Created: {new Date(note.createdAt).toLocaleDateString()}</p>
                   <p>Last updated: {new Date(note.updatedAt).toLocaleDateString()}</p>
                 </div>

@@ -15,6 +15,7 @@ export interface Note {
   notesClass: string;
   notesSubject: string;
   chapter: number;
+  content: string;
   featuredImage: string;
   author: string;
   authorId: string;
