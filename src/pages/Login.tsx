@@ -17,7 +17,7 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Simple validation
     if (!email || !password) {
       toast({
@@ -45,7 +45,7 @@ const Login = () => {
       });
 
       const data = await response.json();
-
+      console.log("data from login: ", data);
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
       }
@@ -54,7 +54,7 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify({
         email,
         isLoggedIn: true,
-        token: data.token
+        token: data?.data?.accessToken
       }));
 
       toast({
@@ -103,8 +103,8 @@ const Login = () => {
                   disabled={isLoading}
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-accent hover:bg-accent-hover"
                 disabled={isLoading}
               >

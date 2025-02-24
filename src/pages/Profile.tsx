@@ -46,6 +46,9 @@ interface Experience {
 }
 
 const Profile = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const token = user.token;
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
@@ -57,7 +60,7 @@ const Profile = () => {
       const response = await fetch('https://api.myedusync.com/getTutorProfile', {
         headers: {
           'Accept': 'application/json',
-          'Authorization': 'Bearer',
+          'Authorization': `Bearer ${token}`,
         }
       });
       if (!response.ok) throw new Error('Failed to fetch profile');
@@ -68,14 +71,14 @@ const Profile = () => {
   const { data: educationList = [] } = useQuery({
     queryKey: ['tutorEducation'],
     queryFn: async () => {
-      const response = await fetch('https://api.myedusync.com/allTutorEducationList', {
+      const response: any = await fetch('https://api.myedusync.com/allTutorEducationList', {
         headers: {
           'Accept': 'application/json',
-          'Authorization': 'Bearer',
+          'Authorization': `Bearer ${token}`,
         }
       });
       if (!response.ok) throw new Error('Failed to fetch education');
-      return response.json();
+      return response.data.json();
     },
   });
 
@@ -85,7 +88,7 @@ const Profile = () => {
       const response = await fetch('https://api.myedusync.com/allTutorExperienceList', {
         headers: {
           'Accept': 'application/json',
-          'Authorization': 'Bearer',
+          'Authorization': `Bearer ${token}`,
         }
       });
       if (!response.ok) throw new Error('Failed to fetch experience');
@@ -95,7 +98,7 @@ const Profile = () => {
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (newPassword !== confirmPassword) {
       toast({
         variant: "destructive",
@@ -153,34 +156,34 @@ const Profile = () => {
                   <CardContent className="space-y-6">
                     <div className="flex items-center gap-6">
                       <Avatar className="h-24 w-24">
-                        <AvatarImage src={profileData?.profilePic} alt={profileData?.name} />
-                        <AvatarFallback>{profileData?.name?.[0]}</AvatarFallback>
+                        <AvatarImage src={profileData?.data?.profilePic} alt={profileData?.data?.name} />
+                        <AvatarFallback>{profileData?.data?.name?.[0]}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <h2 className="text-2xl font-semibold">{profileData?.name}</h2>
-                        <p className="text-muted-foreground">{profileData?.currentDesignation}</p>
+                        <h2 className="text-2xl font-semibold">{profileData?.data?.name}</h2>
+                        <p className="text-muted-foreground">{profileData?.data?.currentDesignation}</p>
                       </div>
                     </div>
                     <div className="grid gap-4">
                       <div>
                         <Label>Email</Label>
-                        <p className="text-gray-700">{profileData?.emailId}</p>
+                        <p className="text-gray-700">{profileData?.data?.emailId}</p>
                       </div>
                       <div>
                         <Label>Phone</Label>
-                        <p className="text-gray-700">{profileData?.phoneNumber}</p>
+                        <p className="text-gray-700">{profileData?.data?.phoneNumber}</p>
                       </div>
                       <div>
                         <Label>Location</Label>
-                        <p className="text-gray-700">{profileData?.location}</p>
+                        <p className="text-gray-700">{profileData?.data?.location}</p>
                       </div>
                       <div>
                         <Label>About Me</Label>
-                        <p className="text-gray-700">{profileData?.aboutMe}</p>
+                        <p className="text-gray-700">{profileData?.data?.aboutMe}</p>
                       </div>
                       <div>
                         <Label>Skills</Label>
-                        <p className="text-gray-700">{profileData?.skills}</p>
+                        <p className="text-gray-700">{profileData?.data?.skills}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -194,7 +197,7 @@ const Profile = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                      {educationList.map((education: Education) => (
+                    {Array.isArray(educationList) && educationList.map((education) => (
                         <div key={education._id.timestamp} className="border rounded-lg p-4">
                           <h3 className="text-lg font-semibold">{education.instituteName}</h3>
                           <p className="text-muted-foreground">{education.courseName} - {education.fieldOfStudy}</p>
@@ -218,7 +221,8 @@ const Profile = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                      {experienceList.map((experience: Experience) => (
+                    {Array.isArray(experienceList) && experienceList.map((experience) => (
+                      // {experienceList.map((experience: Experience) => (
                         <div key={experience._id.timestamp} className="border rounded-lg p-4">
                           <h3 className="text-lg font-semibold">{experience.organisationName}</h3>
                           <p className="text-muted-foreground">{experience.designation}</p>
