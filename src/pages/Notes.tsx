@@ -25,16 +25,16 @@ const Notes = () => {
     queryKey: ['notes', selectedBoard, selectedClass, selectedSubject],
     queryFn: async () => {
       const url = selectedBoard === "SelectBoard" || !selectedClass || !selectedSubject
-        ? 'https://api.myedusync.com/getNotesLists?page=0&limit=10&board=CBSE&class=10&subject=Science'
+        ? 'https://api.myedusync.com/getNotesLists?page=0&limit=10'
         : `https://www.myedusync.com/api/getNotesLists?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
-      
+
       const response = await fetch(url, {
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer',
         }
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch notes');
       }
@@ -94,7 +94,7 @@ const Notes = () => {
       <main className="flex-grow pt-24">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-primary mb-8">Study Notes</h1>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {/* Board Selection */}
             <div className="space-y-2">
@@ -152,41 +152,54 @@ const Notes = () => {
             </div>
           </div>
 
-          {/* Notes List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-              <p className="col-span-full text-center text-gray-500">Loading notes...</p>
-            ) : notes.length > 0 ? (
-              notes.map((note: Note) => (
-                <Card
-                  key={note._id}
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => handleNoteClick(note._id)}
-                >
-                  <CardHeader>
-                    <CardTitle>{note.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">By {note.author}</p>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {note.tags?.map((tag, index) => (
-                        <span key={index} className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-xs">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Created: {new Date(note.createdAt).toLocaleDateString()}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <p className="col-span-full text-center text-gray-500">
-                No notes found for the selected criteria.
-              </p>
-            )}
-          </div>
+          {/* Latest Notes Section */}
+          <section className="py-20">
+            <div className="container mx-auto px-4">
+              <h2 className="text-3xl font-bold text-center mb-12">Latest Study Notes</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {notes.map((note) => (
+                  <Card
+                    key={note._id}
+                    className="hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => navigate(`/notes/${note._id}`)}
+                  >
+                    <CardHeader>
+                      {note.featuredImage && (
+                        <img
+                          src={note.featuredImage}
+                          alt={note.title}
+                          className="w-full h-48 object-cover rounded-t-lg mb-4"
+                        />
+                      )}
+                      <CardTitle className="text-xl">{note.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">By {note.author}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {note.tags?.slice(0, 5).map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="pt-2">
+                          <p><span className="font-medium">Subject:</span> {note.notesSubject}</p>
+                          <p><span className="font-medium">Class:</span> {note.notesClass}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Created: {new Date(note.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
       </main>
       <Footer />
