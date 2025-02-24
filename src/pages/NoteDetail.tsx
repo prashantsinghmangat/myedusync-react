@@ -1,15 +1,18 @@
 
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Note } from "@/types/notes";
 
 const NoteDetail = () => {
   const { id } = useParams();
+  const location = useLocation();
+  const noteFromNav = location.state?.note as Note;
 
-  const { data: note, isLoading } = useQuery({
+  const { data: fetchedNote, isLoading } = useQuery({
     queryKey: ['note', id],
     queryFn: async () => {
       const response = await fetch(`https://api.myedusync.com/getNotesLists?page=0&limit=10&board=CBSE&class=10&subject=Science`, {
@@ -24,7 +27,7 @@ const NoteDetail = () => {
       }
       
       const responseData = await response.json();
-      const foundNote = responseData.data.find((note: any) => note._id === id);
+      const foundNote = responseData.data.find((note: Note) => note._id === id);
       
       if (!foundNote) {
         throw new Error('Note not found');
@@ -32,9 +35,12 @@ const NoteDetail = () => {
       
       return foundNote;
     },
+    enabled: !noteFromNav, // Only fetch if we don't have the note from navigation
   });
 
-  if (isLoading) {
+  const note = noteFromNav || fetchedNote;
+
+  if (isLoading && !noteFromNav) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -101,7 +107,7 @@ const NoteDetail = () => {
                   <h3 className="text-lg font-semibold mb-4">Content</h3>
                   <div 
                     className="prose max-w-none"
-                    dangerouslySetInnerHTML={{ __html: note.content }}
+                    dangerouslySetInnerHTML={{ __html: note.body }}
                   />
                 </div>
                 
