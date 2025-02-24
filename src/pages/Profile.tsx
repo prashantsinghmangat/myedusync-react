@@ -69,29 +69,36 @@ const Profile = () => {
   });
 
   const { data: educationList = [] } = useQuery({
-    queryKey: ['tutorEducation'],
+    queryKey: ["tutorEducation"],
     queryFn: async () => {
-      const response: any = await fetch('https://api.myedusync.com/allTutorEducationList', {
+      const response = await fetch("https://api.myedusync.com/allTutorEducationList", {
         headers: {
-          'Accept': 'application/json',
+          'Accept': "application/json",
           'Authorization': `Bearer ${token}`,
-        }
+        },
       });
-      if (!response.ok) throw new Error('Failed to fetch education');
-      return response.data.json();
+
+      if (!response.ok) throw new Error("Failed to fetch education");
+
+      const data = await response.json();
+      console.log(data.data);
+      return data?.data;
     },
   });
 
+
   const { data: experienceList = [] } = useQuery({
-    queryKey: ['tutorExperience'],
+    queryKey: ["tutorExperience"],
     queryFn: async () => {
-      const response = await fetch('https://api.myedusync.com/allTutorExperienceList', {
+      const response = await fetch("https://api.myedusync.com/allTutorExperienceList", {
         headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        }
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
-      if (!response.ok) throw new Error('Failed to fetch experience');
+
+      if (!response.ok) throw new Error("Failed to fetch experience");
+
       return response.json();
     },
   });
@@ -153,42 +160,54 @@ const Profile = () => {
                   <CardHeader>
                     <CardTitle>Account Details</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex items-center gap-6">
-                      <Avatar className="h-24 w-24">
-                        <AvatarImage src={profileData?.data?.profilePic} alt={profileData?.data?.name} />
-                        <AvatarFallback>{profileData?.data?.name?.[0]}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h2 className="text-2xl font-semibold">{profileData?.data?.name}</h2>
-                        <p className="text-muted-foreground">{profileData?.data?.currentDesignation}</p>
+                  <CardContent>
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                      {/* Profile Image & Name */}
+                      <div className="flex flex-col items-center md:items-start">
+                        <Avatar className="h-28 w-28 border-2 border-gray-300">
+                          <AvatarImage src={profileData?.data?.profilePic} alt={profileData?.data?.name} />
+                          <AvatarFallback>{profileData?.data?.name?.[0]}</AvatarFallback>
+                        </Avatar>
+                        <h2 className="text-2xl font-semibold mt-4 text-center md:text-left">{profileData?.data?.name}</h2>
+                        <p className="text-muted-foreground text-sm text-center md:text-left">{profileData?.data?.currentDesignation}</p>
                       </div>
-                    </div>
-                    <div className="grid gap-4">
-                      <div>
-                        <Label>Email</Label>
-                        <p className="text-gray-700">{profileData?.data?.emailId}</p>
-                      </div>
-                      <div>
-                        <Label>Phone</Label>
-                        <p className="text-gray-700">{profileData?.data?.phoneNumber}</p>
-                      </div>
-                      <div>
-                        <Label>Location</Label>
-                        <p className="text-gray-700">{profileData?.data?.location}</p>
-                      </div>
-                      <div>
-                        <Label>About Me</Label>
-                        <p className="text-gray-700">{profileData?.data?.aboutMe}</p>
-                      </div>
-                      <div>
-                        <Label>Skills</Label>
-                        <p className="text-gray-700">{profileData?.data?.skills}</p>
+
+                      {/* Grid Layout for Account Details */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-sm text-gray-700">
+                        <div>
+                          <Label className="font-semibold">Email</Label>
+                          <p className="bg-gray-100 p-2 rounded-md">{profileData?.data?.emailId}</p>
+                        </div>
+                        <div>
+                          <Label className="font-semibold">Phone</Label>
+                          <p className="bg-gray-100 p-2 rounded-md">{profileData?.data?.phoneNumber}</p>
+                        </div>
+                        <div>
+                          <Label className="font-semibold">Location</Label>
+                          <p className="bg-gray-100 p-2 rounded-md">{profileData?.data?.location}</p>
+                        </div>
+                        <div>
+                          <Label className="font-semibold">Role</Label>
+                          <p className="bg-gray-100 p-2 rounded-md">{profileData?.data?.role}</p>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <Label className="font-semibold">Short Bio</Label>
+                          <p className="bg-gray-100 p-2 rounded-md">{profileData?.data?.shortBio}</p>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <Label className="font-semibold">About Me</Label>
+                          <p className="bg-gray-100 p-2 rounded-md">{profileData?.data?.aboutMe}</p>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <Label className="font-semibold">Skills</Label>
+                          <p className="bg-gray-100 p-2 rounded-md">{profileData?.data?.skills}</p>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
+
 
               <TabsContent value="education">
                 <Card>
@@ -197,22 +216,49 @@ const Profile = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                    {Array.isArray(educationList) && educationList.map((education) => (
-                        <div key={education._id.timestamp} className="border rounded-lg p-4">
-                          <h3 className="text-lg font-semibold">{education.instituteName}</h3>
-                          <p className="text-muted-foreground">{education.courseName} - {education.fieldOfStudy}</p>
-                          <div className="mt-2 text-sm text-gray-600">
-                            <p>Grade: {education.grade}</p>
-                            <p>
-                              {new Date(education.startTime).getFullYear()} - {new Date(education.endTime).getFullYear()}
-                            </p>
+                      {educationList.length > 0 ? (
+                        educationList.map((education, index) => (
+                          <div
+                            key={index}
+                            className="border rounded-lg p-6 shadow-md bg-white flex flex-col md:flex-row gap-6"
+                          >
+                            {/* Left: Text Details */}
+                            <div className="flex-1 space-y-3">
+                              <h3 className="text-lg font-semibold text-primary">{education.instituteName}</h3>
+                              <p className="text-muted-foreground text-sm">{education.courseName} - {education.fieldOfStudy}</p>
+
+                              {/* Grid Layout for Additional Details */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+                                <p><strong>Grade:</strong> {education.grade}</p>
+                                <p><strong>Start Date:</strong> {new Date(education.startTime).toLocaleDateString()}</p>
+                                <p><strong>End Date:</strong> {new Date(education.endTime).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+
+                            {/* Right: Certificate Image */}
+                            {education.credentialUrl && (
+                              <div className="flex-shrink-0">
+                                <p className="font-semibold text-gray-800">Certificate:</p>
+                                <a href={education.credentialUrl} target="_blank" rel="noopener noreferrer">
+                                  <img
+                                    src={education.credentialUrl}
+                                    alt="Certificate"
+                                    className="mt-2 w-40 h-24 object-cover rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
+                                  />
+                                </a>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-gray-500 text-center">No education history available.</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
+
+
 
               <TabsContent value="experience">
                 <Card>
@@ -221,20 +267,23 @@ const Profile = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                    {Array.isArray(experienceList) && experienceList.map((experience) => (
-                      // {experienceList.map((experience: Experience) => (
-                        <div key={experience._id.timestamp} className="border rounded-lg p-4">
-                          <h3 className="text-lg font-semibold">{experience.organisationName}</h3>
-                          <p className="text-muted-foreground">{experience.designation}</p>
-                          <p className="text-sm text-gray-600">{experience.type}</p>
-                          <div className="mt-2 text-sm text-gray-600">
-                            <p>
-                              {new Date(experience.startTime).toLocaleDateString()} - {" "}
-                              {new Date(experience.endTime).toLocaleDateString()}
-                            </p>
+                      {experienceList.length > 0 ? (
+                        experienceList.map((experience, index) => (
+                          <div key={index} className="border rounded-lg p-4">
+                            <h3 className="text-lg font-semibold">{experience.organisationName}</h3>
+                            <p className="text-muted-foreground">{experience.designation}</p>
+                            <p className="text-sm text-gray-600">{experience.type}</p>
+                            <div className="mt-2 text-sm text-gray-600">
+                              <p>
+                                {new Date(experience.startTime).toLocaleDateString()} -{" "}
+                                {new Date(experience.endTime).toLocaleDateString()}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-gray-500">No work experience available.</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
