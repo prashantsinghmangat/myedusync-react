@@ -11,7 +11,7 @@ import type { CourseDetail } from "@/types/courses";
 const CourseDetail = () => {
   const { id } = useParams();
 
-  const { data: course, isLoading } = useQuery({
+  const { data: courseData, isLoading } = useQuery({
     queryKey: ['course', id],
     queryFn: async () => {
       const response = await fetch(`https://api.myedusync.com/courseDetails/${id}`, {
@@ -25,7 +25,8 @@ const CourseDetail = () => {
         throw new Error('Failed to fetch course details');
       }
 
-      return response.json();
+      const data = await response.json();
+      return data?.data;
     },
   });
 
@@ -43,7 +44,7 @@ const CourseDetail = () => {
     );
   }
 
-  if (!course) {
+  if (!courseData) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -66,30 +67,30 @@ const CourseDetail = () => {
             <CardHeader>
               <div className="flex flex-col md:flex-row gap-6 items-start">
                 <img
-                  src={course.courseThumbnail}
-                  alt={course.subject}
+                  src={courseData.courseThumbnail}
+                  alt={courseData.subject}
                   className="w-full md:w-1/3 rounded-lg object-cover"
                 />
                 <div className="flex-1">
-                  <CardTitle className="text-3xl mb-4">{course.subject}</CardTitle>
+                  <CardTitle className="text-3xl mb-4">{courseData.subject}</CardTitle>
                   <div className="flex items-center gap-4 mb-4">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src={course.profilePic} alt={course.name} />
-                      <AvatarFallback>{course.name[0]}</AvatarFallback>
+                      <AvatarImage src={courseData.profilePic} alt={courseData.name} />
+                      <AvatarFallback>{courseData.name[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-semibold">{course.name}</p>
-                      <p className="text-sm text-muted-foreground">{course.currentDesignation}</p>
+                      <p className="font-semibold">{courseData.name}</p>
+                      <p className="text-sm text-muted-foreground">{courseData.currentDesignation}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <p><span className="font-medium">Board:</span> {course.board}</p>
-                    <p><span className="font-medium">Class:</span> {course.className}</p>
-                    <p><span className="font-medium">Sessions:</span> {course.weeklySessions} per week</p>
-                    <p><span className="font-medium">Mode:</span> {course.mode}</p>
-                    <p><span className="font-medium">Language:</span> {course.language}</p>
+                    <p><span className="font-medium">Board:</span> {courseData.board}</p>
+                    <p><span className="font-medium">Class:</span> {courseData.className}</p>
+                    <p><span className="font-medium">Sessions:</span> {courseData.weeklySessions} per week</p>
+                    <p><span className="font-medium">Mode:</span> {courseData.mode}</p>
+                    <p><span className="font-medium">Language:</span> {courseData.language}</p>
                     <p className="text-primary font-semibold">
-                      {course.costPerSessions} {course.currency} per session
+                      {courseData.costPerSessions} {courseData.currency} per session
                     </p>
                   </div>
                 </div>
@@ -99,8 +100,8 @@ const CourseDetail = () => {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xl font-semibold mb-2">About the Instructor</h3>
-                  <p className="text-gray-600">{course.aboutMe}</p>
-                  <p className="text-sm text-muted-foreground mt-2">Location: {course.location}</p>
+                  <p className="text-gray-600">{courseData.aboutMe}</p>
+                  <p className="text-sm text-muted-foreground mt-2">Location: {courseData.location}</p>
                 </div>
 
                 <Separator />
@@ -108,7 +109,7 @@ const CourseDetail = () => {
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Course Content</h3>
                   <div className="prose max-w-none">
-                    {course.aboutThisCourse.split('\n').map((line, index) => (
+                    {courseData.aboutThisCourse.split('\n').map((line, index) => (
                       <p key={index} className="mb-2">{line}</p>
                     ))}
                   </div>
