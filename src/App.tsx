@@ -12,6 +12,7 @@ import NoteDetail from "@/pages/NoteDetail";
 import NotFound from "@/pages/NotFound";
 import Blog from "@/pages/Blog";
 import Courses from "@/pages/Courses";
+import CourseDetail from "@/pages/CourseDetail";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/notes/:id" element={<NoteDetail />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/courses/:id" element={<CourseDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
