@@ -1,13 +1,24 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
-import { User } from "lucide-react";
+import { User, LogOut } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 export const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -20,7 +31,6 @@ export const Header = () => {
       setIsTeacher(false);
     }
 
-    // Listen for storage changes
     const handleStorageChange = () => {
       const user = localStorage.getItem("user");
       if (user) {
@@ -37,11 +47,21 @@ export const Header = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    toast({
+      title: "Success",
+      description: "You have been logged out",
+    });
+    navigate("/login");
+  };
+
   return (
     <header className="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2 shrink-0">
             <img 
               src="/lovable-uploads/2557202f-2fb8-4411-aded-c15cc766021d.png" 
               alt="MyEduSync Logo" 
@@ -64,36 +84,56 @@ export const Header = () => {
           </button>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
-              Home
-            </Link>
-            <Link to="/notes" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
-              Notes
-            </Link>
-            <Link to="/courses" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
-              Courses
-            </Link>
-            <Link to="/blog" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
-              Blog
-            </Link>
-            <Link to="/about" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
-              About Us
-            </Link>
-            {isTeacher && (
-              <Link to="/add-notes" className="text-accent hover:text-accent-hover transition-colors text-sm font-medium">
-                Add Notes
+          <nav className="hidden md:flex items-center justify-center flex-1 px-4">
+            <div className="flex items-center space-x-4 lg:space-x-6">
+              <Link to="/" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
+                Home
               </Link>
-            )}
+              <Link to="/notes" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
+                Notes
+              </Link>
+              <Link to="/courses" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
+                Courses
+              </Link>
+              <Link to="/blog" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
+                Blog
+              </Link>
+              <Link to="/about" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
+                About Us
+              </Link>
+              {isTeacher && (
+                <Link to="/add-notes" className="text-accent hover:text-accent-hover transition-colors text-sm font-medium">
+                  Add Notes
+                </Link>
+              )}
+            </div>
           </nav>
 
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Auth Buttons / Profile */}
+          <div className="hidden md:flex items-center space-x-4 shrink-0">
             {isLoggedIn ? (
-              <Link to="/profile" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <User className="h-5 w-5 text-gray-600" />
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="w-full cursor-pointer">
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
-              <>
+              <div className="flex items-center space-x-2">
                 <Link to="/login">
                   <Button variant="outline" size="sm" className="text-sm">
                     Login
@@ -104,40 +144,51 @@ export const Header = () => {
                     Register
                   </Button>
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        <div className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} py-4 border-t`}>
-          <nav className="flex flex-col space-y-4">
-            <Link to="/" className="text-gray-600 hover:text-accent transition-colors px-4 py-2">
+        <div 
+          className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} py-4 border-t absolute left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg`}
+        >
+          <nav className="flex flex-col space-y-2 px-4">
+            <Link to="/" className="text-gray-600 hover:text-accent transition-colors py-2">
               Home
             </Link>
-            <Link to="/notes" className="text-gray-600 hover:text-accent transition-colors px-4 py-2">
+            <Link to="/notes" className="text-gray-600 hover:text-accent transition-colors py-2">
               Notes
             </Link>
-            <Link to="/courses" className="text-gray-600 hover:text-accent transition-colors px-4 py-2">
+            <Link to="/courses" className="text-gray-600 hover:text-accent transition-colors py-2">
               Courses
             </Link>
-            <Link to="/blog" className="text-gray-600 hover:text-accent transition-colors px-4 py-2">
+            <Link to="/blog" className="text-gray-600 hover:text-accent transition-colors py-2">
               Blog
             </Link>
-            <Link to="/about" className="text-gray-600 hover:text-accent transition-colors px-4 py-2">
+            <Link to="/about" className="text-gray-600 hover:text-accent transition-colors py-2">
               About Us
             </Link>
             {isTeacher && (
-              <Link to="/add-notes" className="text-accent hover:text-accent-hover transition-colors px-4 py-2">
+              <Link to="/add-notes" className="text-accent hover:text-accent-hover transition-colors py-2">
                 Add Notes
               </Link>
             )}
             {isLoggedIn ? (
-              <Link to="/profile" className="text-gray-600 hover:text-accent transition-colors px-4 py-2">
-                Profile
-              </Link>
+              <>
+                <Link to="/profile" className="text-gray-600 hover:text-accent transition-colors py-2">
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-left text-red-600 hover:text-red-700 transition-colors py-2 flex items-center"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </button>
+              </>
             ) : (
-              <div className="space-y-2 px-4">
+              <div className="space-y-2 pt-2">
                 <Link to="/login" className="block">
                   <Button variant="outline" className="w-full">
                     Login
