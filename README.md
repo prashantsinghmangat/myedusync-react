@@ -1,69 +1,100 @@
-# Welcome to your Lovable project
 
-## Project info
+# MyEduSync - Educational Platform
 
-**URL**: https://lovable.dev/projects/665c78c9-d8f6-463f-9119-65167f60b15b
+## Overview
+MyEduSync is a comprehensive educational platform that connects students with expert tutors and provides access to high-quality study materials. The platform features course management, note sharing, and interactive learning experiences.
 
-## How can I edit this code?
+## Features
+- **User Authentication**: Secure login and registration system
+- **Course Management**: Browse and enroll in courses
+- **Study Notes**: Access and share educational notes
+- **Profile Management**: Detailed tutor and student profiles
+- **Responsive Design**: Fully responsive interface for all devices
 
-There are several ways of editing your application.
+## Tech Stack
+- **Frontend Framework**: React with TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **State Management**: React Query for server state
+- **Routing**: React Router v6
+- **Icons**: Lucide React icons
+- **UI Components**: Customized shadcn/ui components
 
-**Use Lovable**
+## Project Structure
+```
+src/
+├── components/        # Reusable UI components
+├── pages/            # Page components
+├── hooks/            # Custom React hooks
+├── types/            # TypeScript type definitions
+├── lib/             # Utility functions
+└── assets/          # Static assets
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/665c78c9-d8f6-463f-9119-65167f60b15b) and start prompting.
+## Key Components
 
-Changes made via Lovable will be committed automatically to this repo.
+### Header
+- Responsive navigation menu
+- Dynamic user authentication state
+- Profile icon for logged-in users
+- Mobile-friendly hamburger menu
 
-**Use your preferred IDE**
+### Profile
+- Tabbed interface for user information
+- Account details management
+- Education and experience history
+- Password change functionality
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Notes
+- List and grid views of study materials
+- Detailed note viewing
+- Tag-based organization
+- Search and filter capabilities
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Styling Guidelines
+- **Colors**: Uses a custom theme with primary indigo and accent colors
+- **Typography**: Inter for sans-serif and Playfair Display for serif
+- **Components**: Consistent use of shadcn/ui components
+- **Animations**: Smooth transitions and hover effects
 
-Follow these steps:
+## Getting Started
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Clone the repository:
+```bash
+git clone <repository-url>
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Install dependencies:
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+4. Open [http://localhost:5173](http://localhost:5173) in your browser
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Best Practices
+- Component-based architecture
+- TypeScript for type safety
+- Responsive design principles
+- Consistent error handling
+- Performance optimization
 
-**Use GitHub Codespaces**
+## Available Scripts
+- `npm run dev`: Start development server
+- `npm run build`: Build for production
+- `npm run preview`: Preview production build
+- `npm run lint`: Run ESLint
+- `npm run type-check`: Run TypeScript checks
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Contributing
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
 
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/665c78c9-d8f6-463f-9119-65167f60b15b) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
