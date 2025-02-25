@@ -84,8 +84,9 @@ const Notes = () => {
     setSelectedSubject(value);
   };
 
-  const handleNoteClick = (noteId: string) => {
-    navigate(`/notes/${noteId}`);
+  const handleNoteClick = (note: Note) => {
+    console.log("note data send: ", note);
+    navigate(`/notes/${note._id}`, { state: { note } }); // Pass note in state
   };
 
   return (
@@ -161,7 +162,7 @@ const Notes = () => {
                   <Card
                     key={note._id}
                     className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/notes/${note._id}`)}
+                    onClick={() => handleNoteClick(note)} // Pass the note to navigation
                   >
                     <CardHeader>
                       {note.featuredImage && (

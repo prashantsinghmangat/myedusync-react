@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
+import { Note } from "@/types/notes";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -48,10 +49,16 @@ const Index = () => {
     },
   });
 
+  const handleNoteClick = (note: Note) => {
+    console.log("note data send: ", note);
+    navigate(`/notes/${note._id}`, { state: { note } }); // Pass note in state
+  };
+
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      
+
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-muted to-white py-20 md:py-32">
@@ -81,7 +88,7 @@ const Index = () => {
             <h2 className="text-3xl font-bold text-center mb-12">Meet Our Top Tutors</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {tutors.map((tutor) => (
-                <Card 
+                <Card
                   key={tutor._id}
                   className="hover:shadow-lg transition-shadow cursor-pointer"
                   onClick={() => navigate(`/courses/${tutor._id}`)}
@@ -118,10 +125,10 @@ const Index = () => {
             <h2 className="text-3xl font-bold text-center mb-12">Latest Study Notes</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {notes.map((note) => (
-                <Card 
+                <Card
                   key={note._id}
                   className="hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/notes/${note._id}`)}
+                  onClick={() => handleNoteClick(note)}
                 >
                   <CardHeader>
                     {note.featuredImage && (
@@ -137,8 +144,8 @@ const Index = () => {
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">By {note.author}</p>
                       <div className="flex flex-wrap gap-2">
-                        {note.tags?.map((tag, index) => (
-                          <span 
+                        {note.tags?.slice(0, 5).map((tag, index) => (
+                          <span
                             key={index}
                             className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full"
                           >
@@ -159,8 +166,8 @@ const Index = () => {
               ))}
             </div>
             <div className="text-center mt-8">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 onClick={() => navigate('/notes')}
               >
@@ -189,7 +196,7 @@ const Index = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-accent text-white py-20">
+        {/* <section className="bg-accent text-white py-20">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-6">Ready to Start Your Journey?</h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
@@ -199,7 +206,7 @@ const Index = () => {
               Start Learning Today
             </Button>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <Footer />
