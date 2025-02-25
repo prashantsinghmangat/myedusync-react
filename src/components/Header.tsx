@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
@@ -24,7 +25,7 @@ export const Header = () => {
     if (user) {
       const userData = JSON.parse(user);
       setIsLoggedIn(true);
-      setIsTeacher(userData.role === "teacher");
+      setIsTeacher(userData.role === "Teacher");
     } else {
       setIsLoggedIn(false);
       setIsTeacher(false);
@@ -35,7 +36,7 @@ export const Header = () => {
       if (user) {
         const userData = JSON.parse(user);
         setIsLoggedIn(true);
-        setIsTeacher(userData.role === "teacher");
+        setIsTeacher(userData.role === "Teacher");
       } else {
         setIsLoggedIn(false);
         setIsTeacher(false);
@@ -57,10 +58,10 @@ export const Header = () => {
 
   return (
     <header className="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm">
-      <div className="container mx-auto px-4">
+      <div className="max-w-[2000px] mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 shrink-0">
+          <Link to="/" className="flex items-center space-x-2">
             <img 
               src="/lovable-uploads/2557202f-2fb8-4411-aded-c15cc766021d.png" 
               alt="MyEduSync Logo" 
@@ -113,7 +114,7 @@ export const Header = () => {
           </nav>
 
           {/* Auth Buttons / Profile */}
-          <div className="hidden md:flex items-center space-x-4 shrink-0">
+          <div className="hidden md:flex items-center space-x-4">
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -136,7 +137,7 @@ export const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 pr-4">
                 <Link to="/login">
                   <Button variant="outline" size="sm" className="text-sm">
                     Login
