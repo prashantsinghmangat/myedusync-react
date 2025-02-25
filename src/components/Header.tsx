@@ -1,8 +1,7 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, PenTool } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -101,9 +100,13 @@ export const Header = () => {
               <Link to="/about" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
                 About Us
               </Link>
-              {isTeacher && (
-                <Link to="/add-notes" className="text-accent hover:text-accent-hover transition-colors text-sm font-medium">
-                  Add Notes
+              {isLoggedIn && isTeacher && (
+                <Link 
+                  to="/whiteboard" 
+                  className="text-accent hover:text-accent-hover transition-colors text-sm font-medium flex items-center gap-1"
+                >
+                  <PenTool className="h-4 w-4" />
+                  Whiteboard
                 </Link>
               )}
             </div>
@@ -169,9 +172,13 @@ export const Header = () => {
             <Link to="/about" className="text-gray-600 hover:text-accent transition-colors py-2">
               About Us
             </Link>
-            {isTeacher && (
-              <Link to="/add-notes" className="text-accent hover:text-accent-hover transition-colors py-2">
-                Add Notes
+            {isLoggedIn && isTeacher && (
+              <Link 
+                to="/whiteboard" 
+                className="text-accent hover:text-accent-hover transition-colors py-2 flex items-center gap-2"
+              >
+                <PenTool className="h-4 w-4" />
+                Whiteboard
               </Link>
             )}
             {isLoggedIn ? (
