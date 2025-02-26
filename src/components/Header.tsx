@@ -1,8 +1,8 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { User, LogOut, PenTool } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,7 +57,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md border-b shadow-sm">
+    <header className="fixed w-full top-0 z-50 bg-background/95 backdrop-blur-md border-b shadow-sm">
       <div className="max-w-[2000px] mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -68,20 +68,6 @@ export const Header = () => {
               className="h-8"
             />
           </Link>
-          
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 rounded-md hover:bg-gray-100"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center justify-center flex-1 px-4">
@@ -115,6 +101,7 @@ export const Header = () => {
 
           {/* Auth Buttons / Profile */}
           <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -150,6 +137,23 @@ export const Header = () => {
                 </Link>
               </div>
             )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="flex md:hidden items-center space-x-4">
+            <ThemeToggle />
+            <button
+              className="p-2 rounded-md hover:bg-accent"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
 
