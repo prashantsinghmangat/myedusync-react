@@ -6,12 +6,6 @@ import App from './App'
 import { QueryClient, QueryClientProvider, hydrate } from '@tanstack/react-query'
 import './index.css'
 
-declare global {
-  interface Window {
-    __REACT_QUERY_STATE__: any;
-  }
-}
-
 const queryClient = new QueryClient()
 
 // Hydrate the React Query cache if available
