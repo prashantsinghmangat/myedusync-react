@@ -9,11 +9,8 @@ export function render(url: string) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        // Don't retry on the server
         retry: false,
-        // Don't refetch on the server
         refetchOnWindowFocus: false,
-        // Don't refetch on mount on the server
         refetchOnMount: false
       }
     }
@@ -27,7 +24,6 @@ export function render(url: string) {
     </QueryClientProvider>
   )
 
-  // Get the dehydrated state
   const dehydratedState = JSON.stringify(queryClient.getQueryCache().getAll().map(query => {
     return {
       queryKey: query.queryKey,
