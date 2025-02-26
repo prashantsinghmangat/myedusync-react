@@ -24,6 +24,7 @@ const Notes = () => {
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ['notes', selectedBoard, selectedClass, selectedSubject],
     queryFn: async () => {
+      // Use isomorphic fetch that works in both browser and server environments
       const url = selectedBoard === "SelectBoard" || !selectedClass || !selectedSubject
         ? 'https://api.myedusync.com/getNotesLists?page=0&limit=10'
         : `https://www.myedusync.com/api/getNotesLists?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
@@ -41,6 +42,10 @@ const Notes = () => {
       const responseData = await response.json();
       return responseData.data || [];
     },
+    // Add SSR options
+    initialData: [],
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
   const data: Record<Board, DataStructure> = {
