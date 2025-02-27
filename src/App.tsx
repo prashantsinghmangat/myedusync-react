@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import pkg from 'react-helmet-async';
-const { HelmetProvider } = pkg;
+import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { Toaster } from "@/components/ui/sonner";
 import Notes from './pages/Notes';

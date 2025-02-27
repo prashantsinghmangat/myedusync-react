@@ -1,8 +1,7 @@
 
 import { useLocation } from 'react-router-dom';
 import { DEFAULT_SEO, SEOProps } from '@/utils/seo';
-import pkg from 'react-helmet-async';
-const { Helmet } = pkg;
+import { Helmet } from 'react-helmet-async';
 
 export const SEO = ({ 
   title, 
