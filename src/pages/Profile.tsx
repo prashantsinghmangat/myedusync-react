@@ -12,47 +12,110 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS } from '@/config/api';
-
-interface Education {
-  _id: {
-    timestamp: number;
-    counter: number;
-    randomValue1: number;
-    randomValue2: number;
-  };
-  teacherId: string;
-  instituteName: string;
-  courseName: string;
-  fieldOfStudy: string;
-  startTime: string;
-  endTime: string;
-  grade: string;
-  credentialUrl: string;
-}
-
-interface Experience {
-  _id: {
-    timestamp: number;
-    counter: number;
-    randomValue1: number;
-    randomValue2: number;
-  };
-  teacherId: string;
-  organisationName: string;
-  designation: string;
-  type: string;
-  startTime: string;
-  endTime: string;
-}
+declare var localStorage: Storage;
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const Profile = () => {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const token = user.token;
+  // const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [user, setUser] = useState<any>(null);
+  const [token, setToken] = useState<string | null>(null);
+  // const token = user.token;
+
+  const [openModal, setOpenModal] = useState<"profile" | "education" | "experience" | null>(null);
+  const [formData, setFormData] = useState({
+    fullAddress: "",
+    WhatsAppNumber: "",
+    aboutMe: "",
+    currentDesignation: "",
+    shortBio: "",
+    skills: "",
+
+    // New fields for education
+    instituteName: "",
+    courseName: "",
+    fieldOfStudy: "",
+    startTime: "",
+    endTime: "",
+    grade: "",
+    credentialUrl: "",
+    // New fields for experience
+    organisationName: "",
+    designation: "",
+    type: "",
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      setUser(storedUser);
+      setToken(storedUser?.token || null);
+    }
+  }, []);
+
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+
+  // Handle input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Submit form (Dynamically for profile, education, experience)
+  const handleSubmit = async (type: "profile" | "education" | "experience") => {
+    let apiURL = "";
+    let payload = {};
+
+    if (type === "profile") {
+      apiURL = "https://api.myedusync.com/addTutorBasicDetails";
+      payload = { ...formData };
+    } else if (type === "education") {
+      apiURL = "http://api.myedusync.com/addTutorsEducationDetails";
+      payload = {
+        instituteName: formData.instituteName,
+        courseName: formData.courseName,
+        fieldOfStudy: formData.fieldOfStudy,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        grade: formData.grade,
+        credentialUrl: formData.credentialUrl,
+      };
+    } else if (type === "experience") {
+      apiURL = "http://api.myedusync.com/addTutorsExperienceDetails";
+      payload = {
+        organisationName: formData.organisationName,
+        designation: formData.designation,
+        type: formData.type,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        credentialUrl: formData.credentialUrl,
+      };
+    }
+
+    try {
+      const response = await fetch(apiURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Failed to update");
+
+      toast({ title: `${type} updated successfully!` });
+      setOpenModal(null);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Update failed!" });
+    }
+  };
+
+
 
   const { data: profileData } = useQuery({
     queryKey: ['tutorProfile'],
@@ -158,7 +221,10 @@ const Profile = () => {
               <TabsContent value="account">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Account Details</CardTitle>
+                    <div className="flex justify-between">
+                      <CardTitle>Account Details</CardTitle>
+                      <Button onClick={() => setOpenModal("profile")}>Update Profile</Button>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -212,7 +278,10 @@ const Profile = () => {
               <TabsContent value="education">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Education History</CardTitle>
+                    <div className="flex justify-between">
+                      <CardTitle>Education</CardTitle>
+                      <Button onClick={() => setOpenModal("education")}>Add Education</Button>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
@@ -263,7 +332,10 @@ const Profile = () => {
               <TabsContent value="experience">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Work Experience</CardTitle>
+                    <div className="flex justify-between">
+                      <CardTitle>Experience</CardTitle>
+                      <Button onClick={() => setOpenModal("experience")}>Add Experience</Button>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
@@ -322,6 +394,161 @@ const Profile = () => {
                 </Card>
               </TabsContent>
             </Tabs>
+
+
+            <Dialog open={!!openModal} onOpenChange={() => setOpenModal(null)}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {openModal === "profile" && "Edit Profile"}
+                    {openModal === "education" && "Add Education"}
+                    {openModal === "experience" && "Add Experience"}
+                  </DialogTitle>
+                </DialogHeader>
+
+                {openModal === "profile" && (
+                  <div className="space-y-3">
+                    <Input
+                      name="fullAddress"
+                      value={formData.fullAddress}
+                      onChange={handleChange}
+                      placeholder="Full Address"
+                    />
+                    <Input
+                      name="WhatsAppNumber"
+                      value={formData.WhatsAppNumber}
+                      onChange={handleChange}
+                      placeholder="WhatsApp Number"
+                    />
+                    <Textarea
+                      name="aboutMe"
+                      value={formData.aboutMe}
+                      onChange={handleChange}
+                      placeholder="About Me"
+                    />
+                    <Input
+                      name="currentDesignation"
+                      value={formData.currentDesignation}
+                      onChange={handleChange}
+                      placeholder="Current Designation"
+                    />
+                    <Textarea
+                      name="shortBio"
+                      value={formData.shortBio}
+                      onChange={handleChange}
+                      placeholder="Short Bio"
+                    />
+                    <Input
+                      name="skills"
+                      value={formData.skills}
+                      onChange={handleChange}
+                      placeholder="Skills (comma-separated)"
+                    />
+                  </div>
+                )}
+
+                {openModal === "education" && (
+                  <div className="space-y-3">
+                    <Input
+                      name="instituteName"
+                      value={formData.instituteName}
+                      onChange={handleChange}
+                      placeholder="Institute Name"
+                    />
+                    <Input
+                      name="courseName"
+                      value={formData.courseName}
+                      onChange={handleChange}
+                      placeholder="Course Name"
+                    />
+                    <Input
+                      name="fieldOfStudy"
+                      value={formData.fieldOfStudy}
+                      onChange={handleChange}
+                      placeholder="Field of Study"
+                    />
+                    <Input
+                      name="startTime"
+                      type="date"
+                      value={formData.startTime}
+                      onChange={handleChange}
+                      placeholder="Start Date"
+                    />
+                    <Input
+                      name="endTime"
+                      type="date"
+                      value={formData.endTime}
+                      onChange={handleChange}
+                      placeholder="End Date"
+                    />
+                    <Input
+                      name="grade"
+                      value={formData.grade}
+                      onChange={handleChange}
+                      placeholder="Grade"
+                    />
+                    <Input
+                      name="credentialUrl"
+                      value={formData.credentialUrl}
+                      onChange={handleChange}
+                      placeholder="Credential URL"
+                    />
+                  </div>
+                )}
+
+                {openModal === "experience" && (
+                  <div className="space-y-3">
+                    <Input
+                      name="organisationName"
+                      value={formData.organisationName}
+                      onChange={handleChange}
+                      placeholder="Organization Name"
+                    />
+                    <Input
+                      name="designation"
+                      value={formData.designation}
+                      onChange={handleChange}
+                      placeholder="Designation"
+                    />
+                    <Input
+                      name="type"
+                      value={formData.type}
+                      onChange={handleChange}
+                      placeholder="Type (e.g., Self, Company)"
+                    />
+                    <Input
+                      name="startTime"
+                      type="date"
+                      value={formData.startTime}
+                      onChange={handleChange}
+                      placeholder="Start Date"
+                    />
+                    <Input
+                      name="endTime"
+                      type="date"
+                      value={formData.endTime}
+                      onChange={handleChange}
+                      placeholder="End Date"
+                    />
+                    <Input
+                      name="credentialUrl"
+                      value={formData.credentialUrl}
+                      onChange={handleChange}
+                      placeholder="Credential URL"
+                    />
+                  </div>
+                )}
+
+                <div className="flex justify-end mt-4">
+                  <Button variant="outline" onClick={() => setOpenModal(null)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={() => handleSubmit(openModal!)} className="ml-2">
+                    Save
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </main>

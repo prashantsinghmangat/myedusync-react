@@ -10,6 +10,12 @@ import { API_ENDPOINTS } from '@/config/api';
 import { SEO } from "@/components/SEO";
 import { generateStructuredData } from "@/utils/seo";
 
+import { Hero } from '@/components/sections/Hero';
+import { Mission } from '@/components/sections/Mission';
+import { Stats } from '@/components/sections/Stats';
+import { PopularTeachers } from '@/components/sections/PopularTeachers';
+import { Courses } from '@/components/sections/Courses';
+
 const Index = () => {
   const navigate = useNavigate();
 
@@ -35,7 +41,7 @@ const Index = () => {
   const { data: notes = [] } = useQuery({
     queryKey: ['latestNotes'],
     queryFn: async () => {
-      const response = await fetch(API_ENDPOINTS.notes.list +'?page=0&limit=10', {
+      const response = await fetch(API_ENDPOINTS.notes.list + '?page=0&limit=10', {
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer',
@@ -78,9 +84,17 @@ const Index = () => {
       />
       <Header />
 
+      <main className="pt-1">
+        <Hero />
+        <Mission />
+        <Stats />
+        <PopularTeachers />
+        <Courses />
+      </main>
+
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="bg-gradient-to-b from-muted to-white py-20 md:py-32">
+        {/* <section className="bg-gradient-to-b from-muted to-white py-20 md:py-32">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center animate-fadeIn">
               <h1 className="text-4xl md:text-6xl font-bold text-primary mb-6">
@@ -99,10 +113,10 @@ const Index = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Top Tutors Section */}
-        <section className="py-20 bg-gray-50">
+        {/* <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">Meet Our Top Tutors</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -136,7 +150,7 @@ const Index = () => {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Latest Notes Section */}
         <section className="py-20">

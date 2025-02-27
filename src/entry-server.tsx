@@ -2,8 +2,9 @@
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom/server'
-import pkg from 'react-helmet-async';
-const { HelmetProvider } = pkg;
+import { HelmetProvider } from 'react-helmet-async';
+// import pkg from 'react-helmet-async';
+// const { HelmetProvider } = pkg;
 import App from './App'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
