@@ -3,14 +3,8 @@ import React from 'react'
 import { hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, hydrate } from '@tanstack/react-query'
 import './index.css'
-
-declare global {
-  interface Window {
-    __REACT_QUERY_STATE__?: any;
-  }
-}
 
 // Only run this code in the browser
 if (typeof window !== 'undefined') {
@@ -24,7 +18,7 @@ if (typeof window !== 'undefined') {
 
   // Hydrate the React Query cache if available
   if (window.__REACT_QUERY_STATE__) {
-    queryClient.setQueriesData(window.__REACT_QUERY_STATE__)
+    hydrate(queryClient, window.__REACT_QUERY_STATE__)
   }
 
   hydrateRoot(
