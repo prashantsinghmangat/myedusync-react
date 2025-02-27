@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
-import { Separator } from "@/components/ui/separator";
+import { API_ENDPOINTS } from '@/config/api';
 
 interface Education {
   _id: {
@@ -57,7 +57,7 @@ const Profile = () => {
   const { data: profileData } = useQuery({
     queryKey: ['tutorProfile'],
     queryFn: async () => {
-      const response = await fetch('https://api.myedusync.com/getTutorProfile', {
+      const response = await fetch(API_ENDPOINTS.tutors.getTutorProfile, {
         headers: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -71,7 +71,7 @@ const Profile = () => {
   const { data: educationList = [] } = useQuery({
     queryKey: ["tutorEducation"],
     queryFn: async () => {
-      const response = await fetch("https://api.myedusync.com/allTutorEducationList", {
+      const response = await fetch(API_ENDPOINTS.tutors.educationList, {
         headers: {
           'Accept': "application/json",
           'Authorization': `Bearer ${token}`,
@@ -90,7 +90,7 @@ const Profile = () => {
   const { data: experienceList = [] } = useQuery({
     queryKey: ["tutorExperience"],
     queryFn: async () => {
-      const response = await fetch("https://api.myedusync.com/allTutorExperienceList", {
+      const response = await fetch(API_ENDPOINTS.tutors.experienceList, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,

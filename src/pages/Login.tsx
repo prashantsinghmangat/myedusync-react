@@ -7,11 +7,14 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { API_ENDPOINTS } from '@/config/api';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -31,7 +34,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.myedusync.com/login', {
+      const response = await fetch(API_ENDPOINTS.auth.login, {
+        // const response = await fetch('https://api.myedusync.com/login', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -43,6 +47,17 @@ const Login = () => {
           password: password
         })
       });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setErrorMessage("Invalid email or password.");
+        } else {
+          const data = await response.json();
+          setErrorMessage(data.data);
+        }
+        setIsLoading(false);
+        return;
+      }
 
       const data = await response.json();
       console.log("data from login: ", data);
@@ -105,6 +120,7 @@ const Login = () => {
                   disabled={isLoading}
                 />
               </div>
+              <div className="error-message text-red-500 text-sm">{errorMessage}</div>
               <Button
                 type="submit"
                 className="w-full bg-accent hover:bg-accent-hover"

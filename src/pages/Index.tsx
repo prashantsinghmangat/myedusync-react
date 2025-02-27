@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { Note } from "@/types/notes";
+import { API_ENDPOINTS } from '@/config/api';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Index = () => {
   const { data: tutors = [] } = useQuery({
     queryKey: ['topTutors'],
     queryFn: async () => {
-      const response = await fetch('https://api.myedusync.com/getTopTutorProfileWithLatestCourse', {
+      const response = await fetch(API_ENDPOINTS.tutors.list, {
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer',
@@ -33,7 +34,7 @@ const Index = () => {
   const { data: notes = [] } = useQuery({
     queryKey: ['latestNotes'],
     queryFn: async () => {
-      const response = await fetch('https://api.myedusync.com/getNotesLists?page=0&limit=10', {
+      const response = await fetch(API_ENDPOINTS.notes.list +'?page=0&limit=10', {
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer',

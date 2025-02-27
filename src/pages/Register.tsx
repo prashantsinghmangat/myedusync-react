@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { API_ENDPOINTS } from '@/config/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -34,7 +35,7 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Simple validation
     if (!formData.role || !formData.name || !formData.email || !formData.password) {
       toast({
@@ -57,7 +58,7 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.myedusync.com/register', {
+      const response = await fetch(API_ENDPOINTS.auth.register, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -98,7 +99,7 @@ const Register = () => {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!otp) {
       toast({
         variant: "destructive",
@@ -111,7 +112,7 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.myedusync.com/verifyOtp', {
+      const response = await fetch(API_ENDPOINTS.auth.verifyOtp, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -257,8 +258,8 @@ const Register = () => {
                     disabled={isLoading}
                   />
                 </div>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-accent hover:bg-accent-hover"
                   disabled={isLoading}
                 >
@@ -279,8 +280,8 @@ const Register = () => {
                     disabled={isLoading}
                   />
                 </div>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-accent hover:bg-accent-hover"
                   disabled={isLoading}
                 >
