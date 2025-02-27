@@ -36,10 +36,22 @@ async function createServer() {
       const { render } = await vite.ssrLoadModule('/src/entry-server.tsx')
 
       // Render the app
-      const { html: appHtml, dehydratedState } = await render(url)
+      const { html: appHtml, dehydratedState, helmetContext } = await render(url)
+
+      // Get Helmet data
+      const { helmet } = helmetContext
+
+      // Inject meta tags and other SEO elements
+      const seoHtml = `
+        ${helmet.title.toString()}
+        ${helmet.meta.toString()}
+        ${helmet.link.toString()}
+        ${helmet.script.toString()}
+      `
 
       // Inject the app-rendered HTML and React Query state into the template
       const html = template
+        .replace('</head>', `${seoHtml}</head>`)
         .replace(`<div id="root"></div>`, `<div id="root">${appHtml}</div>`)
         .replace(
           '</head>',

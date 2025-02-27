@@ -2,6 +2,7 @@
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom/server'
+import { HelmetProvider } from 'react-helmet-async'
 import App from './App'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
@@ -16,12 +17,16 @@ export function render(url: string) {
     }
   })
 
+  const helmetContext = {};
+
   const html = ReactDOMServer.renderToString(
-    <QueryClientProvider client={queryClient}>
-      <StaticRouter location={url}>
-        <App />
-      </StaticRouter>
-    </QueryClientProvider>
+    <HelmetProvider context={helmetContext}>
+      <QueryClientProvider client={queryClient}>
+        <StaticRouter location={url}>
+          <App />
+        </StaticRouter>
+      </QueryClientProvider>
+    </HelmetProvider>
   )
 
   const dehydratedState = JSON.stringify(queryClient.getQueryCache().getAll().map(query => {
@@ -31,5 +36,5 @@ export function render(url: string) {
     }
   }))
 
-  return { html, dehydratedState }
+  return { html, dehydratedState, helmetContext }
 }
