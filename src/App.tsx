@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { Toaster } from "@/components/ui/sonner";
+import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+import { Toaster } from "@/components/ui/sonner";
 import Notes from './pages/Notes';
 import About from './pages/About';
 import Blog from './pages/Blog';
@@ -18,11 +18,9 @@ import Register from './pages/Register';
 import Whiteboard from './pages/Whiteboard';
 import AddNotes from './pages/AddNotes';
 
-const queryClient = new QueryClient();
-
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <HelmetProvider>
       <ThemeProvider defaultTheme="system" storageKey="app-theme">
         <Routes>
           <Route path="/" element={<Index />} />
@@ -41,7 +39,7 @@ const App = () => {
         </Routes>
         <Toaster />
       </ThemeProvider>
-    </QueryClientProvider>
+    </HelmetProvider>
   );
 };
 
