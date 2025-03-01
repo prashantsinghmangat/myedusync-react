@@ -15,6 +15,7 @@ import { API_ENDPOINTS } from '@/config/api';
 declare var localStorage: Storage;
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { fetchWithInterceptor } from "@/utils/apiInterceptor";
 
 const Profile = () => {
   // const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -23,6 +24,9 @@ const Profile = () => {
   // const token = user.token;
 
   const [openModal, setOpenModal] = useState<"profile" | "education" | "experience" | null>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const [formData, setFormData] = useState({
     fullAddress: "",
     WhatsAppNumber: "",
@@ -56,8 +60,6 @@ const Profile = () => {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
 
   // Handle input changes
@@ -97,16 +99,14 @@ const Profile = () => {
     }
 
     try {
-      const response = await fetch(apiURL, {
+      await fetchWithInterceptor(apiURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
+        requiresAuth: true,
       });
-
-      if (!response.ok) throw new Error("Failed to update");
 
       toast({ title: `${type} updated successfully!` });
       setOpenModal(null);
@@ -118,15 +118,11 @@ const Profile = () => {
 
 
   const { data: profileData } = useQuery({
-    queryKey: ['tutorProfile'],
+    queryKey: ["tutorProfile"],
     queryFn: async () => {
-      const response = await fetch(API_ENDPOINTS.tutors.getTutorProfile, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        }
+      const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.getTutorProfile, {
+        requiresAuth: true,
       });
-      if (!response.ok) throw new Error('Failed to fetch profile');
       return response.json();
     },
   });
@@ -134,17 +130,10 @@ const Profile = () => {
   const { data: educationList = [] } = useQuery({
     queryKey: ["tutorEducation"],
     queryFn: async () => {
-      const response = await fetch(API_ENDPOINTS.tutors.educationList, {
-        headers: {
-          'Accept': "application/json",
-          'Authorization': `Bearer ${token}`,
-        },
+      const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.educationList, {
+        requiresAuth: true,
       });
-
-      if (!response.ok) throw new Error("Failed to fetch education");
-
       const data = await response.json();
-      console.log(data.data);
       return data?.data;
     },
   });
@@ -153,15 +142,9 @@ const Profile = () => {
   const { data: experienceList = [] } = useQuery({
     queryKey: ["tutorExperience"],
     queryFn: async () => {
-      const response = await fetch(API_ENDPOINTS.tutors.experienceList, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.experienceList, {
+        requiresAuth: true,
       });
-
-      if (!response.ok) throw new Error("Failed to fetch experience");
-
       return response.json();
     },
   });

@@ -6,12 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { API_ENDPOINTS } from '@/config/api';
 import { Note } from "@/types/notes";
 import { useEffect } from "react";
-import { useLoading } from "@/providers/LoadingProvider";
+// import { useLoading } from "@/providers/LoadingProvider";
 import { apiGet } from "@/utils/apiInterceptor";
 
 export const LatestNotes = () => {
   const navigate = useNavigate();
-  const { setIsLoading } = useLoading();
+  // const { setIsLoading } = useLoading();
 
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ['latestNotes'],
@@ -26,9 +26,9 @@ export const LatestNotes = () => {
   });
 
   // Show global loader during API calls
-  useEffect(() => {
-    setIsLoading(isLoading);
-  }, [isLoading, setIsLoading]);
+  // useEffect(() => {
+  //   setIsLoading(isLoading);
+  // }, [isLoading, setIsLoading]);
 
   const handleNoteClick = (note: Note) => {
     console.log("note data send: ", note);
