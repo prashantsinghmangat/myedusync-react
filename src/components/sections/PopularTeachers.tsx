@@ -2,21 +2,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { Star } from 'lucide-react';
 import { API_ENDPOINTS } from '@/config/api';
+import { apiGet } from '@/utils/apiInterceptor';
 
 export const PopularTeachers = () => {
     const { data: tutors = [], isLoading, error } = useQuery({
         queryKey: ['topTutors'],
         queryFn: async () => {
-            const response = await fetch(API_ENDPOINTS.tutors.list, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': 'Bearer', // Ensure token is included if needed
-                }
+            const response = await apiGet(API_ENDPOINTS.tutors.list, {
+              requiresAuth: true
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch top tutors');
-            }
 
             const data = await response.json();
             return data?.data || [];

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Note } from "@/types/notes";
 import { ChevronLeft } from "lucide-react"; // Importing back icon
 import { useLoading } from "@/providers/LoadingProvider";
+import { apiGet } from "@/utils/apiInterceptor";
 
 const NoteDetail = () => {
   const { id } = useParams();
@@ -22,7 +23,9 @@ const NoteDetail = () => {
   useEffect(() => {
     setIsLoading(loading);
     
-    fetch("https://api.myedusync.com/getNotesLists?page=0&limit=5")
+    apiGet("https://api.myedusync.com/getNotesLists?page=0&limit=5", {
+      requiresAuth: true
+    })
       .then((res) => res.json())
       .then((data) => {
         setRecentNotes(data.data || []);

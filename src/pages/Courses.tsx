@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -14,9 +14,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import type { Course } from "@/types/courses";
+import { apiGet } from "@/utils/apiInterceptor";
+import { useLoading } from "@/providers/LoadingProvider";
 
 const Courses = () => {
   const navigate = useNavigate();
+  const { setIsLoading } = useLoading();
   const [selectedBoard, setSelectedBoard] = useState<string>("");
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
@@ -29,21 +32,18 @@ const Courses = () => {
         ? `${baseUrl}?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`
         : baseUrl;
 
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer',
-        }
+      const response = await apiGet(url, {
+        requiresAuth: true
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch courses');
-      }
 
       const data = await response.json();
       return data?.data || [];
     },
   });
+
+  useEffect(() => {
+    setIsLoading(isLoading);
+  }, [isLoading, setIsLoading]);
 
   const boards = ["CBSE", "ICSE", "IGCSE", "Edexcel"];
   const classes = Array.from({ length: 5 }, (_, i) => (i + 8).toString());
@@ -109,9 +109,7 @@ const Courses = () => {
 
           {/* Course List */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-              <p className="col-span-full text-center text-gray-500">Loading courses...</p>
-            ) : courses.length > 0 ? (
+            {courses.length > 0 ? (
               courses.map((course: Course) => (
                 <Card 
                   key={course._id}
@@ -142,7 +140,7 @@ const Courses = () => {
               ))
             ) : (
               <p className="col-span-full text-center text-gray-500">
-                No courses found for the selected criteria.
+                {isLoading ? "Loading courses..." : "No courses found for the selected criteria."}
               </p>
             )}
           </div>
