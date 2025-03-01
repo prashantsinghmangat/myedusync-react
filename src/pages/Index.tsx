@@ -15,6 +15,10 @@ import { Mission } from '@/components/sections/Mission';
 import { Stats } from '@/components/sections/Stats';
 import { PopularTeachers } from '@/components/sections/PopularTeachers';
 import { Courses } from '@/components/sections/Courses';
+import { Testimonials } from '@/components/sections/Testimonials';
+import { FAQ } from '@/components/sections/FAQ';
+
+import { BookOpen, Users, Award, Clock } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -74,6 +78,29 @@ const Index = () => {
       'https://linkedin.com/company/myedusync'
     ]
   });
+
+  const features = [
+    {
+      icon: <BookOpen className="w-6 h-6 text-blue-600" />,
+      title: "Expert-Led Courses",
+      description: "Learn from industry professionals with years of experience in their fields."
+    },
+    {
+      icon: <Users className="w-6 h-6 text-blue-600" />,
+      title: "Community Support",
+      description: "Join a community of learners and get help whenever you need it."
+    },
+    {
+      icon: <Award className="w-6 h-6 text-blue-600" />,
+      title: "Recognized Certificates",
+      description: "Earn certificates that are recognized by top employers worldwide."
+    },
+    {
+      icon: <Clock className="w-6 h-6 text-blue-600" />,
+      title: "Learn at Your Pace",
+      description: "Access course materials 24/7 and learn at a schedule that works for you."
+    }
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -210,23 +237,34 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section className="py-20 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">Why Choose MyEduSync?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section className="py-16 px-6 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-4">
+                Why Choose Us
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Features that make learning easier</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                We've designed our platform with features that enhance your learning experience and help you achieve your goals faster.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="p-6 rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow"
-                >
-                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+                <div key={index} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                   <p className="text-gray-600">{feature.description}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
+
+        <Testimonials />
+        <FAQ />
 
         {/* CTA Section */}
         {/* <section className="bg-accent text-white py-20">
@@ -247,19 +285,5 @@ const Index = () => {
   );
 };
 
-const features = [
-  {
-    title: "Personalized Learning Plans",
-    description: "Custom-tailored study programs designed to match your unique learning style and goals.",
-  },
-  {
-    title: "Expert Tutors",
-    description: "Learn from experienced educators passionate about helping students succeed.",
-  },
-  {
-    title: "Flexible Scheduling",
-    description: "Book sessions at times that work best for you, with 24/7 availability.",
-  },
-];
 
 export default Index;
