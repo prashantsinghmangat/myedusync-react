@@ -1,3 +1,4 @@
+
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
@@ -7,22 +8,35 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Note } from "@/types/notes";
 import { ChevronLeft } from "lucide-react"; // Importing back icon
+import { useLoading } from "@/providers/LoadingProvider";
 
 const NoteDetail = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { setIsLoading } = useLoading();
+  const [loading, setLoading] = useState(true);
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const note = location.state?.note as Note;
 
   useEffect(() => {
+    setIsLoading(loading);
+    
     fetch("https://api.myedusync.com/getNotesLists?page=0&limit=5")
       .then((res) => res.json())
       .then((data) => {
         setRecentNotes(data.data || []);
+        setLoading(false);
       })
-      .catch((error) => console.error("Error fetching recent notes:", error));
-  }, []);
+      .catch((error) => {
+        console.error("Error fetching recent notes:", error);
+        setLoading(false);
+      });
+      
+    return () => {
+      setIsLoading(false);
+    };
+  }, [setIsLoading]);
 
   if (!note) {
     return (

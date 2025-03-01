@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import {
@@ -14,9 +14,12 @@ import { Board, DataStructure, Note } from "@/types/notes";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Label } from "@/components/ui/label";
+import { API_ENDPOINTS } from "@/config/api";
+import { useLoading } from "@/providers/LoadingProvider";
 
 const Notes = () => {
   const navigate = useNavigate();
+  const { setIsLoading } = useLoading();
   const [selectedBoard, setSelectedBoard] = useState<Board>("SelectBoard");
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -26,8 +29,8 @@ const Notes = () => {
     queryFn: async () => {
       // Use isomorphic fetch that works in both browser and server environments
       const url = selectedBoard === "SelectBoard" || !selectedClass || !selectedSubject
-        ? 'https://api.myedusync.com/getNotesLists?page=0&limit=10'
-        : `https://www.myedusync.com/api/getNotesLists?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
+        ? `${API_ENDPOINTS.notes.list}?page=0&limit=10`
+        : `${API_ENDPOINTS.notes.list}?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
 
       const response = await fetch(url, {
         headers: {
@@ -47,6 +50,11 @@ const Notes = () => {
     refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
+
+  // Show global loader during API calls
+  useEffect(() => {
+    setIsLoading(isLoading);
+  }, [isLoading, setIsLoading]);
 
   const data: Record<Board, DataStructure> = {
     SelectBoard: createDataStructure(),
@@ -162,48 +170,54 @@ const Notes = () => {
           <section className="py-20">
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-center mb-12">Latest Study Notes</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {notes.map((note) => (
-                  <Card
-                    key={note._id}
-                    className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => handleNoteClick(note)} // Pass the note to navigation
-                  >
-                    <CardHeader>
-                      {note.featuredImage && (
-                        <img
-                          src={note.featuredImage}
-                          alt={note.title}
-                          className="w-full h-48 object-cover rounded-t-lg mb-4"
-                        />
-                      )}
-                      <CardTitle className="text-xl">{note.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">By {note.author}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {note.tags?.slice(0, 5).map((tag, idx) => (
-                            <span
-                              key={idx}
-                              className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
+              {notes.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {notes.map((note) => (
+                    <Card
+                      key={note._id}
+                      className="hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => handleNoteClick(note)}
+                    >
+                      <CardHeader>
+                        {note.featuredImage && (
+                          <img
+                            src={note.featuredImage}
+                            alt={note.title}
+                            className="w-full h-48 object-cover rounded-t-lg mb-4"
+                          />
+                        )}
+                        <CardTitle className="text-xl">{note.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">By {note.author}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {note.tags?.slice(0, 5).map((tag, idx) => (
+                              <span
+                                key={idx}
+                                className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="pt-2">
+                            <p><span className="font-medium">Subject:</span> {note.notesSubject}</p>
+                            <p><span className="font-medium">Class:</span> {note.notesClass}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Created: {new Date(note.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
                         </div>
-                        <div className="pt-2">
-                          <p><span className="font-medium">Subject:</span> {note.notesSubject}</p>
-                          <p><span className="font-medium">Class:</span> {note.notesClass}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Created: {new Date(note.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No notes found. Please select different filters.</p>
+                </div>
+              )}
             </div>
           </section>
         </div>

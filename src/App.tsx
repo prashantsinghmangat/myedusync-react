@@ -3,6 +3,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+import { LoadingProvider } from '@/providers/LoadingProvider';
 import { Toaster } from "@/components/ui/sonner";
 import Notes from './pages/Notes';
 import About from './pages/About';
@@ -22,22 +23,24 @@ const App = () => {
   return (
     <HelmetProvider>
       <ThemeProvider defaultTheme="system" storageKey="app-theme">
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/courses/:id" element={<CourseDetail />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/notes" element={<Notes />} />
-          <Route path="/notes/:id" element={<NoteDetail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/whiteboard" element={<Whiteboard />} />
-          <Route path="/add-notes" element={<AddNotes />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
+        <LoadingProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/courses/:id" element={<CourseDetail />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/notes/:id" element={<NoteDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/whiteboard" element={<Whiteboard />} />
+            <Route path="/add-notes" element={<AddNotes />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </LoadingProvider>
       </ThemeProvider>
     </HelmetProvider>
   );

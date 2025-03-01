@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { API_ENDPOINTS } from '@/config/api';
 import { Note } from "@/types/notes";
+import { useEffect } from "react";
+import { useLoading } from "@/providers/LoadingProvider";
 
 export const LatestNotes = () => {
   const navigate = useNavigate();
+  const { setIsLoading } = useLoading();
 
-  const { data: notes = [] } = useQuery({
+  const { data: notes = [], isLoading } = useQuery({
     queryKey: ['latestNotes'],
     queryFn: async () => {
       const response = await fetch(API_ENDPOINTS.notes.list + '?page=0&limit=10', {
@@ -27,6 +30,11 @@ export const LatestNotes = () => {
       return data?.data || [];
     },
   });
+
+  // Show global loader during API calls
+  useEffect(() => {
+    setIsLoading(isLoading);
+  }, [isLoading, setIsLoading]);
 
   const handleNoteClick = (note: Note) => {
     console.log("note data send: ", note);
