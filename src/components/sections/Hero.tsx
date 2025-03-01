@@ -6,19 +6,19 @@ export const Hero = () => {
     return (
         <section className="py-16 md:py-24 px-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-900 dark:to-gray-800 relative overflow-hidden">
             {/* Decorative elements matching logo colors */}
-            <div className="absolute top-20 right-1/4 w-4 h-4 rounded-full bg-primary animate-pulse"></div>
+            {/* <div className="absolute top-20 right-1/4 w-4 h-4 rounded-full bg-primary animate-pulse"></div>
             <div className="absolute bottom-40 right-1/3 w-6 h-6 rounded-full bg-highlight animate-pulse"></div>
-            <div className="absolute top-40 left-1/5 w-10 h-10 rounded-full bg-secondary animate-pulse opacity-70"></div>
+            <div className="absolute top-40 left-1/5 w-10 h-10 rounded-full bg-secondary animate-pulse opacity-70"></div> */}
 
-            <div className="max-w-7xl mx-auto px-6 pb-24">
+            <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="space-y-8">
                         <div className="inline-block px-4 py-2 bg-accent/20 rounded-full">
-                            <span className="text-accent dark:text-accent">eLearning Platform</span>
+                            <span className="text-accent dark:text-accent"># eLearning Platform</span>
                         </div>
 
                         <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-                            <span className="text-secondary dark:text-secondary">Syncing</span><br />
+                            <span className="text-orange-500 dark:text-secondary">#Syncing</span><br />
                             Knowledge <br />
                             Empowering Future <br />
                         </h1>
@@ -50,13 +50,21 @@ export const Hero = () => {
                         </div>
                     </div>
 
-                    <div className="relative">
+                    {/* <div className="relative">
                         <div className="absolute -z-10 w-full h-full bg-gradient-to-br from-highlight/60 -right-5 top-5 rounded-2xl transform rotate-3 dark:from-highlight/30"></div>
                         <img
                             src="/lovable-uploads/studentone.jpg"
                             alt="Students learning"
                             className="relative z-10 w-full rounded-2xl shadow-xl" />
+                    </div> */}
+
+                    <div className="relative">
+                        <img
+                           src="/lovable-uploads/studentone.jpg"
+                            alt="MyEduSync Logo"
+                            className="relative w-full max-w-md mx-auto object-contain" />
                     </div>
+
                 </div>
             </div>
         </section>

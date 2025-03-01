@@ -27,23 +27,48 @@ const Notes = () => {
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ['notes', selectedBoard, selectedClass, selectedSubject],
     queryFn: async () => {
-      // Use isomorphic fetch that works in both browser and server environments
       const url = selectedBoard === "SelectBoard" || !selectedClass || !selectedSubject
         ? `${API_ENDPOINTS.notes.list}?page=0&limit=10`
         : `${API_ENDPOINTS.notes.list}?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
 
-      const response = await apiGet(url, {
-        requiresAuth: true
-      });
-      
-      const responseData = await response.json();
-      return responseData.data || [];
+      console.log("Fetching notes from:", url); // Debugging API URL
+
+      try {
+        const response = await apiGet(url, { requiresAuth: true });
+        const responseData = await response.json();
+
+        console.log("API Response:", responseData); // Debugging response
+
+        return responseData.data || []; // Ensure responseData.data exists
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+        return []; // Return empty array to avoid breaking UI
+      }
     },
-    // Add SSR options
-    initialData: [],
     refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
+
+  // const { data: notes = [], isLoading } = useQuery({
+  //   queryKey: ['notes', selectedBoard, selectedClass, selectedSubject],
+  //   queryFn: async () => {
+  //     // Use isomorphic fetch that works in both browser and server environments
+  //     const url = selectedBoard === "SelectBoard" || !selectedClass || !selectedSubject
+  //       ? `${API_ENDPOINTS.notes.list}?page=0&limit=10`
+  //       : `${API_ENDPOINTS.notes.list}?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
+
+  //     const response = await apiGet(url, {
+  //       requiresAuth: true
+  //     });
+
+  //     const responseData = await response.json();
+  //     return responseData.data || [];
+  //   },
+  //   // Add SSR options
+  //   initialData: [],
+  //   refetchOnMount: true,
+  //   refetchOnWindowFocus: false,
+  // });
 
   // Show global loader during API calls
   useEffect(() => {

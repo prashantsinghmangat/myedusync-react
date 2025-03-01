@@ -8,20 +8,20 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Note } from "@/types/notes";
 import { ChevronLeft } from "lucide-react"; // Importing back icon
-import { useLoading } from "@/providers/LoadingProvider";
+// import { useLoading } from "@/providers/LoadingProvider";
 import { apiGet } from "@/utils/apiInterceptor";
 
 const NoteDetail = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { setIsLoading } = useLoading();
+  // const { setIsLoading } = useLoading();
   const [loading, setLoading] = useState(true);
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const note = location.state?.note as Note;
 
   useEffect(() => {
-    setIsLoading(loading);
+    // setIsLoading(loading);
     
     apiGet("https://api.myedusync.com/getNotesLists?page=0&limit=5", {
       requiresAuth: true
@@ -37,9 +37,11 @@ const NoteDetail = () => {
       });
       
     return () => {
-      setIsLoading(false);
+      // setIsLoading(false);
     };
-  }, [setIsLoading]);
+  },
+  //  [setIsLoading]
+  );
 
   if (!note) {
     return (

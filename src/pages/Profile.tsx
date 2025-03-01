@@ -12,167 +12,98 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS } from '@/config/api';
-declare var localStorage: Storage;
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchWithInterceptor } from "@/utils/apiInterceptor";
 
-const Profile = () => {
-  // const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const [user, setUser] = useState<any>(null);
-  const [token, setToken] = useState<string | null>(null);
-  // const token = user.token;
+declare var localStorage: Storage;
 
-  const [openModal, setOpenModal] = useState<"profile" | "education" | "experience" | null>(null);
+const Profile = () => {
+
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  const [formData, setFormData] = useState({
-    fullAddress: "",
-    WhatsAppNumber: "",
-    aboutMe: "",
-    currentDesignation: "",
-    shortBio: "",
-    skills: "",
 
-    // New fields for education
-    instituteName: "",
-    courseName: "",
-    fieldOfStudy: "",
-    startTime: "",
-    endTime: "",
-    grade: "",
-    credentialUrl: "",
-    // New fields for experience
-    organisationName: "",
-    designation: "",
-    type: "",
+  const [user, setUser] = useState<any>(null);
+  const [openModal, setOpenModal] = useState<"profile" | "education" | "experience" | "updateProfileImg" | null>(null);
+  const [formData, setFormData] = useState({
+    fullAddress: "", WhatsAppNumber: "", aboutMe: "", currentDesignation: "",
+    shortBio: "", skills: "", instituteName: "", courseName: "", fieldOfStudy: "",
+    startTime: "", endTime: "", grade: "", credentialUrl: "", organisationName: "",
+    designation: "", type: "", newProfilePic: ""
   });
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-      setUser(storedUser);
-      setToken(storedUser?.token || null);
-    }
-  }, []);
+  const [newPassword, setNewPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
 
-
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
+  useEffect(() => setUser(JSON.parse(localStorage.getItem("user") || "{}")), []);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Submit form (Dynamically for profile, education, experience)
-  const handleSubmit = async (type: "profile" | "education" | "experience") => {
-    let apiURL = "";
-    let payload = {};
+  const handleSubmit = async (type: string) => {
+    const endpoints = {
+      profile: "addTutorBasicDetails",
+      education: "addTutorsEducationDetails",
+      experience: "addTutorsExperienceDetails",
+      updateProfileImg: "uploadTutorProfilePic",
+    };
 
-    if (type === "profile") {
-      apiURL = "https://api.myedusync.com/addTutorBasicDetails";
-      payload = { ...formData };
-    } else if (type === "education") {
-      apiURL = "http://api.myedusync.com/addTutorsEducationDetails";
-      payload = {
-        instituteName: formData.instituteName,
-        courseName: formData.courseName,
-        fieldOfStudy: formData.fieldOfStudy,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        grade: formData.grade,
-        credentialUrl: formData.credentialUrl,
-      };
-    } else if (type === "experience") {
-      apiURL = "http://api.myedusync.com/addTutorsExperienceDetails";
-      payload = {
-        organisationName: formData.organisationName,
-        designation: formData.designation,
-        type: formData.type,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        credentialUrl: formData.credentialUrl,
-      };
-    }
+    const payloads: Record<string, any> = {
+      profile: formData,
+      education: { instituteName: formData.instituteName, courseName: formData.courseName, fieldOfStudy: formData.fieldOfStudy, startTime: formData.startTime, endTime: formData.endTime, grade: formData.grade, credentialUrl: formData.credentialUrl },
+      experience: { organisationName: formData.organisationName, designation: formData.designation, type: formData.type, startTime: formData.startTime, endTime: formData.endTime, credentialUrl: formData.credentialUrl },
+      updateProfileImg: { profilePic: formData.newProfilePic },
+    };
 
     try {
-      await fetchWithInterceptor(apiURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        requiresAuth: true,
-      });
+      await fetchWithInterceptor(`https://api.myedusync.com/${endpoints[type]}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloads[type]), requiresAuth: true });
 
+      refetchData(type);
       toast({ title: `${type} updated successfully!` });
       setOpenModal(null);
-    } catch (error) {
+    } catch {
       toast({ variant: "destructive", title: "Error", description: "Update failed!" });
     }
   };
 
-
-
-  const { data: profileData } = useQuery({
+  const { data: profileData, refetch: refetchProfileData } = useQuery({
     queryKey: ["tutorProfile"],
-    queryFn: async () => {
-      const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.getTutorProfile, {
-        requiresAuth: true,
-      });
-      return response.json();
-    },
+    queryFn: async () => (await fetchWithInterceptor(API_ENDPOINTS.tutors.getTutorProfile, { requiresAuth: true })).json()
   });
 
-  const { data: educationList = [] } = useQuery({
+  const { data: educationList = [], refetch: refetchEducationList } = useQuery({
     queryKey: ["tutorEducation"],
     queryFn: async () => {
-      const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.educationList, {
-        requiresAuth: true,
-      });
-      const data = await response.json();
-      return data?.data;
+      const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.educationList, { requiresAuth: true });
+      return (await response.json())?.data;
     },
   });
 
-
-  const { data: experienceList = [] } = useQuery({
+  const { data: experienceList = [], refetch: refetchExperienceList } = useQuery({
     queryKey: ["tutorExperience"],
     queryFn: async () => {
-      const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.experienceList, {
-        requiresAuth: true,
-      });
-      return response.json();
+      const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.experienceList, { requiresAuth: true });
+      return (await response.json())?.data;
     },
   });
+
+    const refetchData = (type: string) => {
+    if (type === "education") refetchEducationList();
+    else if (type === "experience") refetchExperienceList();
+    else refetchProfileData();
+  };
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (newPassword !== confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Passwords do not match",
-      });
-      return;
-    }
-
-    toast({
-      title: "Success",
-      description: "Password updated successfully",
-    });
+    if (newPassword !== confirmPassword) return toast({ variant: "destructive", title: "Error", description: "Passwords do not match" });
+    toast({ title: "Success", description: "Password updated successfully" });
   };
+
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    toast({
-      title: "Success",
-      description: "You have been logged out",
-    });
+    toast({ title: "Success", description: "You have been logged out" });
     navigate("/login");
   };
 
@@ -210,6 +141,7 @@ const Profile = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
+
                     <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                       {/* Profile Image & Name */}
                       <div className="flex flex-col items-center md:items-start">
@@ -219,7 +151,14 @@ const Profile = () => {
                         </Avatar>
                         <h2 className="text-2xl font-semibold mt-4 text-center md:text-left">{profileData?.data?.name}</h2>
                         <p className="text-muted-foreground text-sm text-center md:text-left">{profileData?.data?.currentDesignation}</p>
+                        <button
+                          className="absolute bg-gray-200 p-1 rounded-full shadow-md hover:bg-gray-300"
+                          onClick={() => setOpenModal("updateProfileImg")}
+                        >
+                          ✏️
+                        </button>
                       </div>
+
 
                       {/* Grid Layout for Account Details */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-sm text-gray-700">
@@ -311,7 +250,6 @@ const Profile = () => {
               </TabsContent>
 
 
-
               <TabsContent value="experience">
                 <Card>
                   <CardHeader>
@@ -353,23 +291,11 @@ const Profile = () => {
                     <form onSubmit={handleUpdatePassword} className="space-y-6">
                       <div className="space-y-2">
                         <Label htmlFor="newPassword">New Password</Label>
-                        <Input
-                          id="newPassword"
-                          type="password"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="Enter new password"
-                        />
+                        <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Enter new password" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="confirmPassword">Confirm Password</Label>
-                        <Input
-                          id="confirmPassword"
-                          type="password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Confirm new password"
-                        />
+                        <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm new password" />
                       </div>
                       <Button type="submit" className="w-full">Update Password</Button>
                     </form>
@@ -382,153 +308,55 @@ const Profile = () => {
             <Dialog open={!!openModal} onOpenChange={() => setOpenModal(null)}>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>
-                    {openModal === "profile" && "Edit Profile"}
-                    {openModal === "education" && "Add Education"}
-                    {openModal === "experience" && "Add Experience"}
+                  <DialogTitle> {openModal === "profile" && "Edit Profile"}
+                    {openModal === "education" && "Add Education"} {openModal === "experience" && "Add Experience"}
+                    {openModal === "updateProfileImg" && "Update Profile Img"}
                   </DialogTitle>
                 </DialogHeader>
 
+                {openModal === "updateProfileImg" && (
+                  <div className="space-y-3">
+                    <Input name="newProfilePic" value={formData.newProfilePic} onChange={handleChange} placeholder="Enter URL of new profile image" />
+                  </div>
+                )}
+
                 {openModal === "profile" && (
                   <div className="space-y-3">
-                    <Input
-                      name="fullAddress"
-                      value={formData.fullAddress}
-                      onChange={handleChange}
-                      placeholder="Full Address"
-                    />
-                    <Input
-                      name="WhatsAppNumber"
-                      value={formData.WhatsAppNumber}
-                      onChange={handleChange}
-                      placeholder="WhatsApp Number"
-                    />
-                    <Textarea
-                      name="aboutMe"
-                      value={formData.aboutMe}
-                      onChange={handleChange}
-                      placeholder="About Me"
-                    />
-                    <Input
-                      name="currentDesignation"
-                      value={formData.currentDesignation}
-                      onChange={handleChange}
-                      placeholder="Current Designation"
-                    />
-                    <Textarea
-                      name="shortBio"
-                      value={formData.shortBio}
-                      onChange={handleChange}
-                      placeholder="Short Bio"
-                    />
-                    <Input
-                      name="skills"
-                      value={formData.skills}
-                      onChange={handleChange}
-                      placeholder="Skills (comma-separated)"
-                    />
+                    <Input name="fullAddress" value={formData.fullAddress} onChange={handleChange} placeholder="Full Address" />
+                    <Input name="WhatsAppNumber" value={formData.WhatsAppNumber} onChange={handleChange} placeholder="WhatsApp Number" />
+                    <Textarea name="aboutMe" value={formData.aboutMe} onChange={handleChange} placeholder="About Me" />
+                    <Input name="currentDesignation" value={formData.currentDesignation} onChange={handleChange} placeholder="Current Designation" />
+                    <Textarea name="shortBio" value={formData.shortBio} onChange={handleChange} placeholder="Short Bio" />
+                    <Input name="skills" value={formData.skills} onChange={handleChange} placeholder="Skills (comma-separated)" />
                   </div>
                 )}
 
                 {openModal === "education" && (
                   <div className="space-y-3">
-                    <Input
-                      name="instituteName"
-                      value={formData.instituteName}
-                      onChange={handleChange}
-                      placeholder="Institute Name"
-                    />
-                    <Input
-                      name="courseName"
-                      value={formData.courseName}
-                      onChange={handleChange}
-                      placeholder="Course Name"
-                    />
-                    <Input
-                      name="fieldOfStudy"
-                      value={formData.fieldOfStudy}
-                      onChange={handleChange}
-                      placeholder="Field of Study"
-                    />
-                    <Input
-                      name="startTime"
-                      type="date"
-                      value={formData.startTime}
-                      onChange={handleChange}
-                      placeholder="Start Date"
-                    />
-                    <Input
-                      name="endTime"
-                      type="date"
-                      value={formData.endTime}
-                      onChange={handleChange}
-                      placeholder="End Date"
-                    />
-                    <Input
-                      name="grade"
-                      value={formData.grade}
-                      onChange={handleChange}
-                      placeholder="Grade"
-                    />
-                    <Input
-                      name="credentialUrl"
-                      value={formData.credentialUrl}
-                      onChange={handleChange}
-                      placeholder="Credential URL"
-                    />
+                    <Input name="instituteName" value={formData.instituteName} onChange={handleChange} placeholder="Institute Name" />
+                    <Input name="courseName" value={formData.courseName} onChange={handleChange} placeholder="Course Name" />
+                    <Input name="fieldOfStudy" value={formData.fieldOfStudy} onChange={handleChange} placeholder="Field of Study" />
+                    <Input name="startTime" type="date" value={formData.startTime} onChange={handleChange} placeholder="Start Date" />
+                    <Input name="endTime" type="date" value={formData.endTime} onChange={handleChange} placeholder="End Date" />
+                    <Input name="grade" value={formData.grade} onChange={handleChange} placeholder="Grade" />
+                    <Input name="credentialUrl" value={formData.credentialUrl} onChange={handleChange} placeholder="Credential URL" />
                   </div>
                 )}
 
                 {openModal === "experience" && (
                   <div className="space-y-3">
-                    <Input
-                      name="organisationName"
-                      value={formData.organisationName}
-                      onChange={handleChange}
-                      placeholder="Organization Name"
-                    />
-                    <Input
-                      name="designation"
-                      value={formData.designation}
-                      onChange={handleChange}
-                      placeholder="Designation"
-                    />
-                    <Input
-                      name="type"
-                      value={formData.type}
-                      onChange={handleChange}
-                      placeholder="Type (e.g., Self, Company)"
-                    />
-                    <Input
-                      name="startTime"
-                      type="date"
-                      value={formData.startTime}
-                      onChange={handleChange}
-                      placeholder="Start Date"
-                    />
-                    <Input
-                      name="endTime"
-                      type="date"
-                      value={formData.endTime}
-                      onChange={handleChange}
-                      placeholder="End Date"
-                    />
-                    <Input
-                      name="credentialUrl"
-                      value={formData.credentialUrl}
-                      onChange={handleChange}
-                      placeholder="Credential URL"
-                    />
+                    <Input name="organisationName" value={formData.organisationName} onChange={handleChange} placeholder="Organization Name" />
+                    <Input name="designation" value={formData.designation} onChange={handleChange} placeholder="Designation" />
+                    <Input name="type" value={formData.type} onChange={handleChange} placeholder="Type (e.g., Self, Company)" />
+                    <Input name="startTime" type="date" value={formData.startTime} onChange={handleChange} placeholder="Start Date" />
+                    <Input name="endTime" type="date" value={formData.endTime} onChange={handleChange} placeholder="End Date" />
+                    <Input name="credentialUrl" value={formData.credentialUrl} onChange={handleChange} placeholder="Credential URL" />
                   </div>
                 )}
 
                 <div className="flex justify-end mt-4">
-                  <Button variant="outline" onClick={() => setOpenModal(null)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={() => handleSubmit(openModal!)} className="ml-2">
-                    Save
-                  </Button>
+                  <Button variant="outline" onClick={() => setOpenModal(null)}>Cancel</Button>
+                  <Button onClick={() => handleSubmit(openModal!)} className="ml-2">Save</Button>
                 </div>
               </DialogContent>
             </Dialog>
