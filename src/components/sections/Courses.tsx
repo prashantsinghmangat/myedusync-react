@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { CircleCheck } from 'lucide-react';
+import { apiGet } from '@/utils/apiInterceptor';
 
 export const Courses = () => {
   const baseUrl = 'https://api.myedusync.com/courses';
@@ -7,16 +8,9 @@ export const Courses = () => {
   const { data: courses = [], isLoading, error } = useQuery({
     queryKey: ['courses'],
     queryFn: async () => {
-      const response = await fetch(baseUrl, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN_HERE', // Add a valid token if required
-        },
+      const response = await apiGet(baseUrl, {
+        requiresAuth: true,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch courses');
-      }
 
       const data = await response.json();
       return data?.data || [];

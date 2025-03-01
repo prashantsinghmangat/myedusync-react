@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -6,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { API_ENDPOINTS } from '@/config/api';
+import { apiPost } from "@/utils/apiInterceptor";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +23,6 @@ const Register = () => {
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -38,60 +37,31 @@ const Register = () => {
 
     // Simple validation
     if (!formData.role || !formData.name || !formData.email || !formData.password) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please fill in all required fields",
-      });
+      toast.error("Please fill in all required fields");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Passwords do not match",
-      });
+      toast.error("Passwords do not match");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch(API_ENDPOINTS.auth.register, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer'
-        },
-        body: JSON.stringify({
-          role: formData.role,
-          emailId: formData.email,
-          phoneNumber: formData.phone,
-          password: formData.password,
-          name: formData.name,
-          location: formData.location
-        })
+      await apiPost(API_ENDPOINTS.auth.register, {
+        role: formData.role,
+        emailId: formData.email,
+        phoneNumber: formData.phone,
+        password: formData.password,
+        name: formData.name,
+        location: formData.location
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-
-      toast({
-        title: "Success",
-        description: "OTP has been sent to your email",
-      });
+      toast.success("OTP has been sent to your email");
       setShowOtp(true);
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to register",
-      });
+      // Error is already handled by the interceptor
     } finally {
       setIsLoading(false);
     }
@@ -101,35 +71,19 @@ const Register = () => {
     e.preventDefault();
 
     if (!otp) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter OTP",
-      });
+      toast.error("Please enter OTP");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch(API_ENDPOINTS.auth.verifyOtp, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer'
-        },
-        body: JSON.stringify({
-          emailId: formData.email,
-          otp: otp
-        })
+      const response = await apiPost(API_ENDPOINTS.auth.verifyOtp, {
+        emailId: formData.email,
+        otp: otp
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'OTP verification failed');
-      }
 
       // Store user data after successful verification
       localStorage.setItem("user", JSON.stringify({
@@ -138,17 +92,10 @@ const Register = () => {
         token: data.token
       }));
 
-      toast({
-        title: "Success",
-        description: "Registration successful! You are now logged in.",
-      });
+      toast.success("Registration successful! You are now logged in.");
       navigate("/profile");
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to verify OTP",
-      });
+      // Error is already handled by the interceptor
     } finally {
       setIsLoading(false);
     }

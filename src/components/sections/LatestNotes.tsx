@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { API_ENDPOINTS } from '@/config/api';
 import { Note } from "@/types/notes";
 import { useEffect } from "react";
 import { useLoading } from "@/providers/LoadingProvider";
+import { apiGet } from "@/utils/apiInterceptor";
 
 export const LatestNotes = () => {
   const navigate = useNavigate();
@@ -15,16 +15,9 @@ export const LatestNotes = () => {
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ['latestNotes'],
     queryFn: async () => {
-      const response = await fetch(API_ENDPOINTS.notes.list + '?page=0&limit=10', {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer',
-        }
+      const response = await apiGet(API_ENDPOINTS.notes.list + '?page=0&limit=10', {
+        requiresAuth: true,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch latest notes');
-      }
 
       const data = await response.json();
       return data?.data || [];

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -16,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Label } from "@/components/ui/label";
 import { API_ENDPOINTS } from "@/config/api";
 import { useLoading } from "@/providers/LoadingProvider";
+import { apiGet } from "@/utils/apiInterceptor";
 
 const Notes = () => {
   const navigate = useNavigate();
@@ -32,16 +32,10 @@ const Notes = () => {
         ? `${API_ENDPOINTS.notes.list}?page=0&limit=10`
         : `${API_ENDPOINTS.notes.list}?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
 
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer',
-        }
+      const response = await apiGet(url, {
+        requiresAuth: true
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch notes');
-      }
+      
       const responseData = await response.json();
       return responseData.data || [];
     },
