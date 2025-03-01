@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -81,22 +82,22 @@ const Index = () => {
 
   const features = [
     {
-      icon: <BookOpen className="w-6 h-6 text-blue-600" />,
+      icon: <BookOpen className="w-6 h-6 text-primary" />,
       title: "Expert-Led Courses",
       description: "Learn from industry professionals with years of experience in their fields."
     },
     {
-      icon: <Users className="w-6 h-6 text-blue-600" />,
+      icon: <Users className="w-6 h-6 text-secondary" />,
       title: "Community Support",
       description: "Join a community of learners and get help whenever you need it."
     },
     {
-      icon: <Award className="w-6 h-6 text-blue-600" />,
+      icon: <Award className="w-6 h-6 text-accent" />,
       title: "Recognized Certificates",
       description: "Earn certificates that are recognized by top employers worldwide."
     },
     {
-      icon: <Clock className="w-6 h-6 text-blue-600" />,
+      icon: <Clock className="w-6 h-6 text-highlight" />,
       title: "Learn at Your Pace",
       description: "Access course materials 24/7 and learn at a schedule that works for you."
     }
@@ -120,74 +121,24 @@ const Index = () => {
       </main>
 
       <main className="flex-grow">
-        {/* Hero Section */}
-        {/* <section className="bg-gradient-to-b from-muted to-white py-20 md:py-32">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center animate-fadeIn">
-              <h1 className="text-4xl md:text-6xl font-bold text-primary mb-6">
-                Personalized Tutoring for Every Student
-              </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                Unlock your full potential with one-on-one tutoring tailored to your unique learning style.
-              </p>
-              <div className="flex justify-center gap-4">
-                <Button size="lg" className="bg-accent hover:bg-accent-hover">
-                  Get Started
-                </Button>
-                <Button size="lg" variant="outline">
-                  Learn More
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section> */}
-
-        {/* Top Tutors Section */}
-        {/* <section className="py-20 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">Meet Our Top Tutors</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {tutors.map((tutor) => (
-                <Card
-                  key={tutor._id}
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/courses/${tutor._id}`)}
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-16 w-16">
-                        <AvatarImage src={tutor.profilePic} alt={tutor.name} />
-                        <AvatarFallback>{tutor.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <CardTitle className="text-xl">{tutor.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{tutor.currentDesignation}</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 mb-4">{tutor.aboutMe}</p>
-                    <div className="space-y-1">
-                      <p><span className="font-medium">Subject:</span> {tutor.subject}</p>
-                      <p><span className="font-medium">Board:</span> {tutor.board}</p>
-                      <p><span className="font-medium">Location:</span> {tutor.location}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section> */}
-
         {/* Latest Notes Section */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">Latest Study Notes</h2>
+        <section className="py-20 bg-white dark:bg-gray-900">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center px-4 py-2 bg-secondary/20 text-secondary dark:text-secondary rounded-full text-sm font-medium mb-4">
+                Latest Resources
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Latest Study Notes</h2>
+              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Access quality study materials prepared by our expert tutors to enhance your learning experience.
+              </p>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {notes.map((note) => (
                 <Card
                   key={note._id}
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                  className="hover:shadow-lg transition-all cursor-pointer border border-gray-200 dark:border-gray-700 dark:bg-gray-800"
                   onClick={() => handleNoteClick(note)}
                 >
                   <CardHeader>
@@ -198,25 +149,25 @@ const Index = () => {
                         className="w-full h-48 object-cover rounded-t-lg mb-4"
                       />
                     )}
-                    <CardTitle className="text-xl">{note.title}</CardTitle>
+                    <CardTitle className="text-xl text-gray-900 dark:text-white">{note.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">By {note.author}</p>
+                      <p className="text-sm text-muted-foreground dark:text-gray-400">By {note.author}</p>
                       <div className="flex flex-wrap gap-2">
                         {note.tags?.slice(0, 5).map((tag, index) => (
                           <span
                             key={index}
-                            className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full"
+                            className="text-xs bg-primary/20 text-primary dark:text-primary px-2 py-1 rounded-full"
                           >
                             {tag}
                           </span>
                         ))}
                       </div>
                       <div className="pt-2">
-                        <p><span className="font-medium">Subject:</span> {note.notesSubject}</p>
-                        <p><span className="font-medium">Class:</span> {note.notesClass}</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-gray-700 dark:text-gray-300"><span className="font-medium">Subject:</span> {note.notesSubject}</p>
+                        <p className="text-gray-700 dark:text-gray-300"><span className="font-medium">Class:</span> {note.notesClass}</p>
+                        <p className="text-sm text-muted-foreground dark:text-gray-400">
                           Created: {new Date(note.createdAt).toLocaleDateString()}
                         </p>
                       </div>
@@ -225,11 +176,12 @@ const Index = () => {
                 </Card>
               ))}
             </div>
-            <div className="text-center mt-8">
+            <div className="text-center mt-12">
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => navigate('/notes')}
+                className="border-primary text-primary hover:bg-primary hover:text-white dark:border-primary dark:text-primary dark:hover:bg-primary dark:hover:text-white"
               >
                 View All Notes
               </Button>
@@ -237,26 +189,26 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="py-16 px-6 bg-white">
+        <section className="py-16 px-6 bg-gray-50 dark:bg-gray-800">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-4">
+              <div className="inline-flex items-center px-4 py-2 bg-accent/20 text-accent dark:text-accent rounded-full text-sm font-medium mb-4">
                 Why Choose Us
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Features that make learning easier</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Features that make learning easier</h2>
+              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
                 We've designed our platform with features that enhance your learning experience and help you achieve your goals faster.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
-                <div key={index} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <div key={index} className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-all">
+                  <div className="w-12 h-12 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center mb-4">
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{feature.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
                 </div>
               ))}
             </div>
@@ -265,25 +217,11 @@ const Index = () => {
 
         <Testimonials />
         <FAQ />
-
-        {/* CTA Section */}
-        {/* <section className="bg-accent text-white py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-6">Ready to Start Your Journey?</h2>
-            <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Join thousands of students who have already transformed their academic performance with MyEduSync.
-            </p>
-            <Button size="lg" variant="secondary" className="bg-white text-accent hover:bg-gray-100">
-              Start Learning Today
-            </Button>
-          </div>
-        </section> */}
       </main>
 
       <Footer />
     </div>
   );
 };
-
 
 export default Index;

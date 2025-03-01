@@ -26,16 +26,20 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#4B0082", // New deeper indigo color
+          DEFAULT: "#7978FF", // Blue from the logo
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#1E90FF", // New vibrant blue color
+          DEFAULT: "#FF7BCD", // Pink from the logo
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#4B0082", // Matching primary color
-          hover: "#380062", // Darker shade for hover
+          DEFAULT: "#FF9F5A", // Orange from the logo
+          hover: "#F08C47", // Darker orange for hover
+        },
+        highlight: {
+          DEFAULT: "#76FFAC", // Green from the logo
+          foreground: "#1A1A1A",
         },
         muted: {
           DEFAULT: "#F4F6F8",
