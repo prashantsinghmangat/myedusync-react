@@ -65,9 +65,9 @@ export const AddEducationModal = ({ isOpen, onClose, onSuccess }: AddEducationMo
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Add Education</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          {/* <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -219,9 +219,9 @@ export const UpdateProfileModal = ({ isOpen, onClose, onSuccess, profileData }: 
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Update Profile</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          {/* <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -415,9 +415,9 @@ export const AddExperienceModal = ({ isOpen, onClose, onSuccess }: AddExperience
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Add Experience</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          {/* <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -552,7 +552,8 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
         toast.error(result.message || "Failed to add course");
       }
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      console.log(error);
+      // toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -565,9 +566,9 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
       <DialogContent className="sm:max-w-lg">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Add New Course</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          {/* <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
