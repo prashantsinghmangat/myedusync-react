@@ -63,9 +63,7 @@ const CourseDetail = () => {
                     <p className="text-gray-600">Home / Course Details</p>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <h3 className="text-xl font-semibold">About This Course</h3>
-                    <p className="text-gray-600">{courseData?.aboutThisCourse}</p>
-                    <Separator />
+                   
 
                     {/* Course Info */}
                     <h3 className="text-xl font-semibold">Course Information</h3>
@@ -93,6 +91,10 @@ const CourseDetail = () => {
                           </li>
                         ))}
                     </ul>
+                    <Separator />
+
+                    <h3 className="text-xl font-semibold">About This Course</h3>
+                    <p className="text-gray-600">{courseData?.aboutThisCourse}</p>
                     <Separator />
                   </CardContent>
                 </Card>
