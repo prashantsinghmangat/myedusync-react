@@ -19,8 +19,7 @@ export const MobileNavigation = ({
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    toast({
-      title: "Success",
+    toast("Success", {
       description: "You have been logged out",
     });
     navigate("/login");

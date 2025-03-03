@@ -11,10 +11,10 @@ import { ExperienceTab } from "@/components/profile/ExperienceTab";
 import { PasswordTab } from "@/components/profile/PasswordTab";
 import { CoursesTab } from "@/components/profile/CoursesTab";
 import { ProfileModals } from "@/components/profile/ProfileModals";
+import { toast } from "sonner";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [openModal, setOpenModal] = useState<"profile" | "education" | "experience" | "updateProfileImg" | "course" | null>(null);
   const [formData, setFormData] = useState({
@@ -57,7 +57,9 @@ const Profile = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    toast({ title: "Success", description: "You have been logged out" });
+    toast("Success", {
+      description: "You have been logged out"
+    });
     navigate("/login");
   };
 

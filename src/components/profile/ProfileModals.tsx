@@ -1,4 +1,4 @@
-// Fixed the import to use sonner toast instead of useToast hook
+
 import { toast } from "sonner";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
@@ -46,22 +46,19 @@ export const AddEducationModal = ({ isOpen, onClose, onSuccess }: AddEducationMo
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: "Success",
+        toast("Success", {
           description: "Education added successfully",
         });
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
+        toast("Error", {
           description: result.message || "Failed to add education",
           variant: "destructive",
         });
       }
     } catch (error) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -211,22 +208,19 @@ export const UpdateProfileModal = ({ isOpen, onClose, onSuccess, profileData }: 
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: "Success",
+        toast("Success", {
           description: "Profile updated successfully",
         });
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
+        toast("Error", {
           description: result.message || "Failed to update profile",
           variant: "destructive",
         });
       }
     } catch (error) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -418,22 +412,19 @@ export const AddExperienceModal = ({ isOpen, onClose, onSuccess }: AddExperience
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: "Success",
+        toast("Success", {
           description: "Experience added successfully",
         });
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
+        toast("Error", {
           description: result.message || "Failed to add experience",
           variant: "destructive",
         });
       }
     } catch (error) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -579,22 +570,19 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: "Success",
+        toast("Success", {
           description: "Course added successfully",
         });
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
+        toast("Error", {
           description: result.message || "Failed to add course",
           variant: "destructive",
         });
       }
     } catch (error) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -761,5 +749,45 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
       </DialogContent>
     </Dialog>,
     document.body
+  );
+};
+
+// Exporting all modals as a component for Profile.tsx
+export const ProfileModals = ({ openModal, setOpenModal, formData, handleChange }) => {
+  const [profileData, setProfileData] = useState({});
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const handleSuccess = () => {
+    // Refresh the page or data
+    window.location.reload();
+  };
+
+  return (
+    <>
+      <AddEducationModal
+        isOpen={openModal === "education"}
+        onClose={() => setOpenModal(null)}
+        onSuccess={handleSuccess}
+      />
+
+      <UpdateProfileModal
+        isOpen={openModal === "profile"}
+        onClose={() => setOpenModal(null)}
+        onSuccess={handleSuccess}
+        profileData={user}
+      />
+
+      <AddExperienceModal
+        isOpen={openModal === "experience"}
+        onClose={() => setOpenModal(null)}
+        onSuccess={handleSuccess}
+      />
+
+      <AddCourseModal
+        isOpen={openModal === "course"}
+        onClose={() => setOpenModal(null)}
+        onSuccess={handleSuccess}
+      />
+    </>
   );
 };
