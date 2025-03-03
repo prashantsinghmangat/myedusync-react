@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import Register from './pages/Register';
 import Whiteboard from './pages/Whiteboard';
 import AddNotes from './pages/AddNotes';
+import BecomeTutor from './pages/BecomeTutor';
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/whiteboard" element={<Whiteboard />} />
             <Route path="/add-notes" element={<AddNotes />} />
+            <Route path="/become-tutor" element={<BecomeTutor />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />

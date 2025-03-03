@@ -9,13 +9,14 @@ import { AccountDetailsTab } from "@/components/profile/AccountDetailsTab";
 import { EducationTab } from "@/components/profile/EducationTab";
 import { ExperienceTab } from "@/components/profile/ExperienceTab";
 import { PasswordTab } from "@/components/profile/PasswordTab";
+import { CoursesTab } from "@/components/profile/CoursesTab";
 import { ProfileModals } from "@/components/profile/ProfileModals";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
-  const [openModal, setOpenModal] = useState<"profile" | "education" | "experience" | "updateProfileImg" | null>(null);
+  const [openModal, setOpenModal] = useState<"profile" | "education" | "experience" | "updateProfileImg" | "course" | null>(null);
   const [formData, setFormData] = useState({
     fullAddress: "", 
     WhatsAppNumber: "", 
@@ -33,7 +34,18 @@ const Profile = () => {
     organisationName: "",
     designation: "", 
     type: "", 
-    newProfilePic: ""
+    newProfilePic: "",
+    // New course fields
+    subject: "",
+    board: "",
+    className: "",
+    weeklySessions: "",
+    costPerSessions: "",
+    currency: "USD",
+    aboutThisCourse: "",
+    courseThumbnail: "",
+    language: "English",
+    mode: "Online"
   });
 
   useEffect(() => setUser(JSON.parse(localStorage.getItem("user") || "{}")), []);
@@ -66,10 +78,11 @@ const Profile = () => {
             </div>
 
             <Tabs defaultValue="account" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
                 <TabsTrigger value="account">Account Details</TabsTrigger>
                 <TabsTrigger value="education">Education</TabsTrigger>
                 <TabsTrigger value="experience">Experience</TabsTrigger>
+                <TabsTrigger value="courses">Courses</TabsTrigger>
                 <TabsTrigger value="password">Password</TabsTrigger>
               </TabsList>
 
@@ -83,6 +96,10 @@ const Profile = () => {
 
               <TabsContent value="experience">
                 <ExperienceTab setOpenModal={setOpenModal} />
+              </TabsContent>
+              
+              <TabsContent value="courses">
+                <CoursesTab setOpenModal={setOpenModal} />
               </TabsContent>
 
               <TabsContent value="password">

@@ -18,6 +18,8 @@ export const API_ENDPOINTS = {
   courses: {
     list: `${API_BASE_URL}/getCourses`,
     detail: (id: string) => `${API_BASE_URL}/getCourse/${id}`,
+    create: `${API_BASE_URL}/createCourse`,
+    tutorCourses: `${API_BASE_URL}/allTutorsCoursesList`,
   },
   auth: {
     login: `${API_BASE_URL}/login`,

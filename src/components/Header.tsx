@@ -1,7 +1,8 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
-import { User, LogOut, PenTool } from "lucide-react";
+import { User, LogOut, PenTool, BookOpen } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import {
   DropdownMenu,
@@ -86,6 +87,10 @@ export const Header = () => {
               </Link>
               <Link to="/about" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
                 About Us
+              </Link>
+              <Link to="/become-tutor" className="text-blue-600 hover:text-blue-700 transition-colors text-sm font-medium flex items-center gap-1">
+                <BookOpen className="h-4 w-4" />
+                Become a Tutor
               </Link>
               {isLoggedIn && isTeacher && (
                 <Link 
@@ -176,6 +181,10 @@ export const Header = () => {
             </Link>
             <Link to="/about" className="text-gray-600 hover:text-accent transition-colors py-2">
               About Us
+            </Link>
+            <Link to="/become-tutor" className="text-blue-600 hover:text-blue-700 transition-colors py-2 flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Become a Tutor
             </Link>
             {isLoggedIn && isTeacher && (
               <Link 

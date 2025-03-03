@@ -1,269 +1,458 @@
-
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { fetchWithInterceptor } from "@/utils/apiInterceptor";
+import React from "react";
 
 interface ProfileModalsProps {
-  openModal: "profile" | "education" | "experience" | "updateProfileImg" | null;
-  setOpenModal: (modal: "profile" | "education" | "experience" | "updateProfileImg" | null) => void;
+  openModal: "profile" | "education" | "experience" | "updateProfileImg" | "course" | null;
+  setOpenModal: (modal: "profile" | "education" | "experience" | "updateProfileImg" | "course" | null) => void;
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
-export const ProfileModals = ({ 
-  openModal, 
-  setOpenModal, 
-  formData, 
-  handleChange 
-}: ProfileModalsProps) => {
+export const ProfileModals = ({ openModal, setOpenModal, formData, handleChange }: ProfileModalsProps) => {
   const { toast } = useToast();
 
-  const { refetch: refetchProfileData } = useQuery({
-    queryKey: ["tutorProfile"],
-    queryFn: async () => (await fetchWithInterceptor("https://api.myedusync.com/getTutorProfile", { requiresAuth: true })).json(),
-    enabled: false
-  });
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, type: string) => {
+    e.preventDefault();
 
-  const { refetch: refetchEducationList } = useQuery({
-    queryKey: ["tutorEducation"],
-    queryFn: async () => {
-      const response = await fetchWithInterceptor("https://api.myedusync.com/getTutorsEducationDetails", { requiresAuth: true });
-      return response.json();
-    },
-    enabled: false
-  });
-
-  const { refetch: refetchExperienceList } = useQuery({
-    queryKey: ["tutorExperience"],
-    queryFn: async () => {
-      const response = await fetchWithInterceptor("https://api.myedusync.com/getTutorsExperienceDetails", { requiresAuth: true });
-      return response.json();
-    },
-    enabled: false
-  });
-
-  const refetchData = (type: string) => {
-    if (type === "education") refetchEducationList();
-    else if (type === "experience") refetchExperienceList();
-    else refetchProfileData();
-  };
-
-  const handleSubmit = async (type: string) => {
-    const endpoints = {
-      profile: "addTutorBasicDetails",
-      education: "addTutorsEducationDetails",
-      experience: "addTutorsExperienceDetails",
-      updateProfileImg: "uploadTutorProfilePic",
-    };
-
-    const payloads: Record<string, any> = {
-      profile: formData,
-      education: { 
-        instituteName: formData.instituteName, 
-        courseName: formData.courseName, 
-        fieldOfStudy: formData.fieldOfStudy, 
-        startTime: formData.startTime, 
-        endTime: formData.endTime, 
-        grade: formData.grade, 
-        credentialUrl: formData.credentialUrl 
-      },
-      experience: { 
-        organisationName: formData.organisationName, 
-        designation: formData.designation, 
-        type: formData.type, 
-        startTime: formData.startTime, 
-        endTime: formData.endTime, 
-        credentialUrl: formData.credentialUrl 
-      },
-      updateProfileImg: { profilePic: formData.newProfilePic },
+    const apiUrl = `https://api.myedusync.com/updateTutorProfile`;
+    const payload = {
+      fullAddress: formData.fullAddress,
+      WhatsAppNumber: formData.WhatsAppNumber,
+      aboutMe: formData.aboutMe,
+      currentDesignation: formData.currentDesignation,
+      shortBio: formData.shortBio,
+      skills: formData.skills,
     };
 
     try {
-      await fetchWithInterceptor(`https://api.myedusync.com/${endpoints[type]}`, { 
-        method: "POST", 
-        headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify(payloads[type]), 
-        requiresAuth: true 
+      const response = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user") || "{}").token}`,
+        },
+        body: JSON.stringify(payload),
       });
 
-      refetchData(type);
-      toast({ title: `${type} updated successfully!` });
-      setOpenModal(null);
-    } catch {
-      toast({ variant: "destructive", title: "Error", description: "Update failed!" });
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: "Profile updated successfully",
+        });
+        setOpenModal(null);
+        window.location.reload();
+      } else {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to update profile",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while updating the profile",
+      });
+    }
+  };
+
+  const handleEducationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("https://api.myedusync.com/createTutorEducation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user") || "{}").token}`,
+        },
+        body: JSON.stringify({
+          instituteName: formData.instituteName,
+          courseName: formData.courseName,
+          fieldOfStudy: formData.fieldOfStudy,
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          grade: formData.grade,
+          credentialUrl: formData.credentialUrl,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: "Education details added successfully",
+        });
+        setOpenModal(null);
+        window.location.reload();
+      } else {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to add education details",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while adding education details",
+      });
+    }
+  };
+
+  const handleExperienceSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("https://api.myedusync.com/createTutorExperience", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user") || "{}").token}`,
+        },
+        body: JSON.stringify({
+          organisationName: formData.organisationName,
+          designation: formData.designation,
+          type: formData.type,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: "Experience details added successfully",
+        });
+        setOpenModal(null);
+        window.location.reload();
+      } else {
+        toast({
+          title: "Error",
+          description: data.message || "Failed to add experience details",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while adding experience details",
+      });
+    }
+  };
+
+  // Add a new submit handler for courses
+  const handleCourseSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch("https://api.myedusync.com/createCourse", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${JSON.parse(localStorage.getItem("user") || "{}").token}`,
+        },
+        body: JSON.stringify({
+          subject: formData.subject,
+          board: formData.board,
+          className: formData.className,
+          weeklySessions: parseInt(formData.weeklySessions),
+          costPerSessions: parseInt(formData.costPerSessions),
+          currency: formData.currency,
+          aboutThisCourse: formData.aboutThisCourse,
+          courseThumbnail: formData.courseThumbnail,
+          language: formData.language,
+          mode: formData.mode,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        toast.success("Course added successfully");
+        setOpenModal(null);
+        // Trigger a page refresh to show the new course
+        window.location.reload();
+      } else {
+        toast.error(data.message || "Failed to add course");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("An error occurred while adding the course");
     }
   };
 
   return (
-    <Dialog open={!!openModal} onOpenChange={() => setOpenModal(null)}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {openModal === "profile" && "Edit Profile"}
-            {openModal === "education" && "Add Education"}
-            {openModal === "experience" && "Add Experience"}
-            {openModal === "updateProfileImg" && "Update Profile Image"}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      {/* Profile Modal */}
+      <Dialog open={openModal === "profile"} onOpenChange={() => setOpenModal(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogDescription>Make changes to your profile here. Click save when you're done.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => handleSubmit(e, "profile")} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullAddress">Full Address</Label>
+              <Input id="fullAddress" name="fullAddress" value={formData.fullAddress} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="WhatsAppNumber">WhatsApp Number</Label>
+              <Input id="WhatsAppNumber" name="WhatsAppNumber" value={formData.WhatsAppNumber} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="aboutMe">About Me</Label>
+              <Textarea id="aboutMe" name="aboutMe" placeholder="Tell us a little bit about yourself" value={formData.aboutMe} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="currentDesignation">Current Designation</Label>
+              <Input id="currentDesignation" name="currentDesignation" value={formData.currentDesignation} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="shortBio">Short Bio</Label>
+              <Input id="shortBio" name="shortBio" value={formData.shortBio} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="skills">Skills</Label>
+              <Input id="skills" name="skills" value={formData.skills} onChange={handleChange} />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpenModal(null)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-        {openModal === "updateProfileImg" && (
-          <div className="space-y-3">
-            <Input 
-              name="newProfilePic" 
-              value={formData.newProfilePic} 
-              onChange={handleChange} 
-              placeholder="Enter URL of new profile image" 
-            />
-          </div>
-        )}
+      {/* Education Modal */}
+      <Dialog open={openModal === "education"} onOpenChange={() => setOpenModal(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Education</DialogTitle>
+            <DialogDescription>Add your education details here. Click save when you're done.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEducationSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="instituteName">Institute Name</Label>
+              <Input id="instituteName" name="instituteName" placeholder="Enter institute name" onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="courseName">Course Name</Label>
+              <Input id="courseName" name="courseName" placeholder="Enter course name" onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fieldOfStudy">Field of Study</Label>
+              <Input id="fieldOfStudy" name="fieldOfStudy" placeholder="Enter field of study" onChange={handleChange} />
+            </div>
+            <div className="space-y-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startTime">Start Time</Label>
+                <Input type="date" id="startTime" name="startTime" onChange={handleChange} />
+              </div>
+              <div>
+                <Label htmlFor="endTime">End Time</Label>
+                <Input type="date" id="endTime" name="endTime" onChange={handleChange} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="grade">Grade</Label>
+              <Input id="grade" name="grade" placeholder="Enter grade" onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="credentialUrl">Credential URL</Label>
+              <Input id="credentialUrl" name="credentialUrl" placeholder="Enter credential URL" onChange={handleChange} />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpenModal(null)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-        {openModal === "profile" && (
-          <div className="space-y-3">
-            <Input 
-              name="fullAddress" 
-              value={formData.fullAddress} 
-              onChange={handleChange} 
-              placeholder="Full Address" 
-            />
-            <Input 
-              name="WhatsAppNumber" 
-              value={formData.WhatsAppNumber} 
-              onChange={handleChange} 
-              placeholder="WhatsApp Number" 
-            />
-            <Textarea 
-              name="aboutMe" 
-              value={formData.aboutMe} 
-              onChange={handleChange} 
-              placeholder="About Me" 
-            />
-            <Input 
-              name="currentDesignation" 
-              value={formData.currentDesignation} 
-              onChange={handleChange} 
-              placeholder="Current Designation" 
-            />
-            <Textarea 
-              name="shortBio" 
-              value={formData.shortBio} 
-              onChange={handleChange} 
-              placeholder="Short Bio" 
-            />
-            <Input 
-              name="skills" 
-              value={formData.skills} 
-              onChange={handleChange} 
-              placeholder="Skills (comma-separated)" 
-            />
-          </div>
-        )}
-
-        {openModal === "education" && (
-          <div className="space-y-3">
-            <Input 
-              name="instituteName" 
-              value={formData.instituteName} 
-              onChange={handleChange} 
-              placeholder="Institute Name" 
-            />
-            <Input 
-              name="courseName" 
-              value={formData.courseName} 
-              onChange={handleChange} 
-              placeholder="Course Name" 
-            />
-            <Input 
-              name="fieldOfStudy" 
-              value={formData.fieldOfStudy} 
-              onChange={handleChange} 
-              placeholder="Field of Study" 
-            />
-            <Input 
-              name="startTime" 
-              type="date" 
-              value={formData.startTime} 
-              onChange={handleChange} 
-              placeholder="Start Date" 
-            />
-            <Input 
-              name="endTime" 
-              type="date" 
-              value={formData.endTime} 
-              onChange={handleChange} 
-              placeholder="End Date" 
-            />
-            <Input 
-              name="grade" 
-              value={formData.grade} 
-              onChange={handleChange} 
-              placeholder="Grade" 
-            />
-            <Input 
-              name="credentialUrl" 
-              value={formData.credentialUrl} 
-              onChange={handleChange} 
-              placeholder="Credential URL" 
-            />
-          </div>
-        )}
-
-        {openModal === "experience" && (
-          <div className="space-y-3">
-            <Input 
-              name="organisationName" 
-              value={formData.organisationName} 
-              onChange={handleChange} 
-              placeholder="Organization Name" 
-            />
-            <Input 
-              name="designation" 
-              value={formData.designation} 
-              onChange={handleChange} 
-              placeholder="Designation" 
-            />
-            <Input 
-              name="type" 
-              value={formData.type} 
-              onChange={handleChange} 
-              placeholder="Type (e.g., Self, Company)" 
-            />
-            <Input 
-              name="startTime" 
-              type="date" 
-              value={formData.startTime} 
-              onChange={handleChange} 
-              placeholder="Start Date" 
-            />
-            <Input 
-              name="endTime" 
-              type="date" 
-              value={formData.endTime} 
-              onChange={handleChange} 
-              placeholder="End Date" 
-            />
-            <Input 
-              name="credentialUrl" 
-              value={formData.credentialUrl} 
-              onChange={handleChange} 
-              placeholder="Credential URL" 
-            />
-          </div>
-        )}
-
-        <div className="flex justify-end mt-4">
-          <Button variant="outline" onClick={() => setOpenModal(null)}>Cancel</Button>
-          <Button onClick={() => handleSubmit(openModal!)} className="ml-2">Save</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      {/* Experience Modal */}
+      <Dialog open={openModal === "experience"} onOpenChange={() => setOpenModal(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Experience</DialogTitle>
+            <DialogDescription>Add your experience details here. Click save when you're done.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleExperienceSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="organisationName">Organisation Name</Label>
+              <Input id="organisationName" name="organisationName" placeholder="Enter organisation name" onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="designation">Designation</Label>
+              <Input id="designation" name="designation" placeholder="Enter designation" onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Input id="type" name="type" placeholder="Enter type" onChange={handleChange} />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpenModal(null)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Course Modal */}
+      <Dialog open={openModal === "course"} onOpenChange={() => setOpenModal(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add New Course</DialogTitle>
+            <DialogDescription>
+              Create a new course to teach students. Fill in all the details below.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCourseSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="subject">Subject</Label>
+                <Input 
+                  id="subject" 
+                  name="subject" 
+                  placeholder="e.g. Mathematics" 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="board">Board</Label>
+                <Input 
+                  id="board" 
+                  name="board" 
+                  placeholder="e.g. CBSE, ICSE, IB" 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="className">Class</Label>
+                <Input 
+                  id="className" 
+                  name="className" 
+                  placeholder="e.g. 10, 11, 12" 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="weeklySessions">Weekly Sessions</Label>
+                <Input 
+                  id="weeklySessions" 
+                  name="weeklySessions" 
+                  type="number" 
+                  placeholder="e.g. 2" 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="costPerSessions">Cost Per Session</Label>
+                <Input 
+                  id="costPerSessions" 
+                  name="costPerSessions" 
+                  type="number" 
+                  placeholder="e.g. 20" 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="currency">Currency</Label>
+                <Input 
+                  id="currency" 
+                  name="currency" 
+                  placeholder="e.g. USD, EUR, INR" 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="language">Language</Label>
+                <Input 
+                  id="language" 
+                  name="language" 
+                  placeholder="e.g. English, Hindi" 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="mode">Mode</Label>
+                <Input 
+                  id="mode" 
+                  name="mode" 
+                  placeholder="e.g. Online, In-person" 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="courseThumbnail">Course Thumbnail URL</Label>
+              <Input 
+                id="courseThumbnail" 
+                name="courseThumbnail" 
+                placeholder="https://example.com/image.jpg" 
+                onChange={handleChange} 
+                required 
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="aboutThisCourse">About This Course</Label>
+              <Textarea 
+                id="aboutThisCourse" 
+                name="aboutThisCourse" 
+                placeholder="Describe your course content, objectives, and what students will learn..." 
+                rows={5}
+                onChange={handleChange} 
+                required 
+              />
+            </div>
+            
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpenModal(null)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add Course</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
