@@ -1,4 +1,3 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 import { Button } from "../ui/button";
@@ -17,9 +16,7 @@ export const UserMenu = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    toast("Success", {
-      description: "You have been logged out",
-    });
+    toast.success("You have been logged out");
     navigate("/login");
   };
 

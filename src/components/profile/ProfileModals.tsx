@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
@@ -46,22 +45,14 @@ export const AddEducationModal = ({ isOpen, onClose, onSuccess }: AddEducationMo
       const result = await response.json();
 
       if (result.success) {
-        toast("Success", {
-          description: "Education added successfully",
-        });
+        toast.success("Education added successfully");
         onSuccess();
         onClose();
       } else {
-        toast("Error", {
-          description: result.message || "Failed to add education",
-          variant: "destructive",
-        });
+        toast.error(result.message || "Failed to add education");
       }
     } catch (error) {
-      toast("Error", {
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -208,22 +199,14 @@ export const UpdateProfileModal = ({ isOpen, onClose, onSuccess, profileData }: 
       const result = await response.json();
 
       if (result.success) {
-        toast("Success", {
-          description: "Profile updated successfully",
-        });
+        toast.success("Profile updated successfully");
         onSuccess();
         onClose();
       } else {
-        toast("Error", {
-          description: result.message || "Failed to update profile",
-          variant: "destructive",
-        });
+        toast.error(result.message || "Failed to update profile");
       }
     } catch (error) {
-      toast("Error", {
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -412,22 +395,14 @@ export const AddExperienceModal = ({ isOpen, onClose, onSuccess }: AddExperience
       const result = await response.json();
 
       if (result.success) {
-        toast("Success", {
-          description: "Experience added successfully",
-        });
+        toast.success("Experience added successfully");
         onSuccess();
         onClose();
       } else {
-        toast("Error", {
-          description: result.message || "Failed to add experience",
-          variant: "destructive",
-        });
+        toast.error(result.message || "Failed to add experience");
       }
     } catch (error) {
-      toast("Error", {
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -570,22 +545,14 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
       const result = await response.json();
 
       if (result.success) {
-        toast("Success", {
-          description: "Course added successfully",
-        });
+        toast.success("Course added successfully");
         onSuccess();
         onClose();
       } else {
-        toast("Error", {
-          description: result.message || "Failed to add course",
-          variant: "destructive",
-        });
+        toast.error(result.message || "Failed to add course");
       }
     } catch (error) {
-      toast("Error", {
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -752,13 +719,11 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
   );
 };
 
-// Exporting all modals as a component for Profile.tsx
 export const ProfileModals = ({ openModal, setOpenModal, formData, handleChange }) => {
   const [profileData, setProfileData] = useState({});
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const handleSuccess = () => {
-    // Refresh the page or data
     window.location.reload();
   };
 

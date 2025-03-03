@@ -1,8 +1,6 @@
-
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { AccountDetailsTab } from "@/components/profile/AccountDetailsTab";
@@ -35,7 +33,6 @@ const Profile = () => {
     designation: "", 
     type: "", 
     newProfilePic: "",
-    // New course fields
     subject: "",
     board: "",
     className: "",
@@ -50,16 +47,13 @@ const Profile = () => {
 
   useEffect(() => setUser(JSON.parse(localStorage.getItem("user") || "{}")), []);
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    toast("Success", {
-      description: "You have been logged out"
-    });
+    toast.success("You have been logged out");
     navigate("/login");
   };
 

@@ -2,6 +2,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { PenTool, BookOpen, LogOut } from "lucide-react";
 import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
 interface MobileNavigationProps {
@@ -19,9 +27,7 @@ export const MobileNavigation = ({
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    toast("Success", {
-      description: "You have been logged out",
-    });
+    toast.success("You have been logged out");
     navigate("/login");
   };
 
