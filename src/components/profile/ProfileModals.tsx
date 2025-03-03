@@ -1,4 +1,3 @@
-// Fixed the import to use sonner toast instead of useToast hook
 import { toast } from "sonner";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
@@ -46,25 +45,14 @@ export const AddEducationModal = ({ isOpen, onClose, onSuccess }: AddEducationMo
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: "Success",
-          description: "Education added successfully",
-        });
+        toast.success("Education added successfully");
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
-          description: result.message || "Failed to add education",
-          variant: "destructive",
-        });
+        toast.error(result.message || "Failed to add education");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -77,9 +65,9 @@ export const AddEducationModal = ({ isOpen, onClose, onSuccess }: AddEducationMo
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Add Education</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          {/* <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -211,25 +199,14 @@ export const UpdateProfileModal = ({ isOpen, onClose, onSuccess, profileData }: 
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: "Success",
-          description: "Profile updated successfully",
-        });
+        toast.success("Profile updated successfully");
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
-          description: result.message || "Failed to update profile",
-          variant: "destructive",
-        });
+        toast.error(result.message || "Failed to update profile");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -242,9 +219,9 @@ export const UpdateProfileModal = ({ isOpen, onClose, onSuccess, profileData }: 
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Update Profile</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          {/* <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -418,25 +395,14 @@ export const AddExperienceModal = ({ isOpen, onClose, onSuccess }: AddExperience
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: "Success",
-          description: "Experience added successfully",
-        });
+        toast.success("Experience added successfully");
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
-          description: result.message || "Failed to add experience",
-          variant: "destructive",
-        });
+        toast.error(result.message || "Failed to add experience");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -449,9 +415,9 @@ export const AddExperienceModal = ({ isOpen, onClose, onSuccess }: AddExperience
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Add Experience</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          {/* <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -579,25 +545,15 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
       const result = await response.json();
 
       if (result.success) {
-        toast({
-          title: "Success",
-          description: "Course added successfully",
-        });
+        toast.success("Course added successfully");
         onSuccess();
         onClose();
       } else {
-        toast({
-          title: "Error",
-          description: result.message || "Failed to add course",
-          variant: "destructive",
-        });
+        toast.error(result.message || "Failed to add course");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      console.log(error);
+      // toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -610,9 +566,9 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
       <DialogContent className="sm:max-w-lg">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Add New Course</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          {/* <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -761,5 +717,43 @@ export const AddCourseModal = ({ isOpen, onClose, onSuccess }: AddCourseModalPro
       </DialogContent>
     </Dialog>,
     document.body
+  );
+};
+
+export const ProfileModals = ({ openModal, setOpenModal, formData, handleChange }) => {
+  const [profileData, setProfileData] = useState({});
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const handleSuccess = () => {
+    window.location.reload();
+  };
+
+  return (
+    <>
+      <AddEducationModal
+        isOpen={openModal === "education"}
+        onClose={() => setOpenModal(null)}
+        onSuccess={handleSuccess}
+      />
+
+      <UpdateProfileModal
+        isOpen={openModal === "profile"}
+        onClose={() => setOpenModal(null)}
+        onSuccess={handleSuccess}
+        profileData={user}
+      />
+
+      <AddExperienceModal
+        isOpen={openModal === "experience"}
+        onClose={() => setOpenModal(null)}
+        onSuccess={handleSuccess}
+      />
+
+      <AddCourseModal
+        isOpen={openModal === "course"}
+        onClose={() => setOpenModal(null)}
+        onSuccess={handleSuccess}
+      />
+    </>
   );
 };

@@ -19,6 +19,8 @@ import Register from './pages/Register';
 import Whiteboard from './pages/Whiteboard';
 import AddNotes from './pages/AddNotes';
 import BecomeTutor from './pages/BecomeTutor';
+import FindTutorSteps from './pages/FindTutorSteps';
+import FindTutor from './pages/FindTutor';
 
 const App = () => {
   return (
@@ -39,6 +41,8 @@ const App = () => {
             <Route path="/whiteboard" element={<Whiteboard />} />
             <Route path="/add-notes" element={<AddNotes />} />
             <Route path="/become-tutor" element={<BecomeTutor />} />
+            <Route path="/find-tutor-steps" element={<FindTutorSteps />} />
+            <Route path="/find-tutor" element={<FindTutor />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />

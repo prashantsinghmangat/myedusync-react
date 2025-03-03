@@ -32,35 +32,45 @@ export const fetchWithInterceptor = async (url: string, config: RequestConfig = 
     // Handle unauthorized responses
     if (response.status === 401) {
       toast.error("Unauthorized: Your session has expired. Please log in again.");
-      
+
       // Clear user data from localStorage
       localStorage.removeItem('user');
-      
+
       // Redirect to login page
       window.location.href = '/login';
-      
+
       throw new Error('Unauthorized');
     }
+    if (response.status === 409) {
+      const errorData = await response.json().catch(() => null);
+      console.log("errorData: ", errorData);  
+      toast.error(errorData?.data || "Conflict error: Course already exists", {
+        duration: 10000, // 10 seconds
+      });
+      return response;
+    }
+
 
     // Handle other error responses
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       const errorMessage = errorData?.message || `Error: ${response.status} ${response.statusText}`;
-      
-      toast.error(errorMessage);
+
+      toast.error(errorData);
       throw new Error(errorMessage);
     }
 
     return response;
   } catch (error) {
+    console.log("response error: ", error);
     // Handle network errors or other exceptions
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    
+
     // Only show toast for errors that aren't already handled (like 401)
     if (errorMessage !== 'Unauthorized') {
       toast.error(errorMessage);
     }
-    
+
     throw error;
   }
 };
