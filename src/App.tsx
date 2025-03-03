@@ -22,7 +22,7 @@ import AddNotes from './pages/AddNotes';
 const App = () => {
   return (
     <HelmetProvider>
-      <ThemeProvider defaultTheme="system" storageKey="app-theme">
+      <ThemeProvider defaultTheme="light" storageKey="app-theme">
         <LoadingProvider>
           <Routes>
             <Route path="/" element={<Index />} />
