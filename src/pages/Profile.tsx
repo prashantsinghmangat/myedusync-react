@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +11,13 @@ import { PasswordTab } from "@/components/profile/PasswordTab";
 import { CoursesTab } from "@/components/profile/CoursesTab";
 import { ProfileModals } from "@/components/profile/ProfileModals";
 import { toast } from "sonner";
+import { fetchWithInterceptor, apiPost } from "@/utils/apiInterceptor";
+import { API_ENDPOINTS } from "@/config/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<any>(null);
   const [openModal, setOpenModal] = useState<"profile" | "education" | "experience" | "updateProfileImg" | "course" | null>(null);
   const [formData, setFormData] = useState({
@@ -49,6 +54,134 @@ const Profile = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFormSubmit = async (formType: string) => {
+    try {
+      let endpoint = "";
+      let payload = {};
+
+      switch (formType) {
+        case "profile":
+          endpoint = API_ENDPOINTS.tutors.getTutorProfile;
+          payload = {
+            fullAddress: formData.fullAddress,
+            WhatsAppNumber: formData.WhatsAppNumber,
+            aboutMe: formData.aboutMe,
+            currentDesignation: formData.currentDesignation,
+            shortBio: formData.shortBio,
+            skills: formData.skills
+          };
+          break;
+        case "education":
+          endpoint = API_ENDPOINTS.tutors.educationList;
+          payload = {
+            instituteName: formData.instituteName,
+            courseName: formData.courseName,
+            fieldOfStudy: formData.fieldOfStudy,
+            startTime: formData.startTime,
+            endTime: formData.endTime,
+            grade: formData.grade,
+            credentialUrl: formData.credentialUrl
+          };
+          break;
+        case "experience":
+          endpoint = API_ENDPOINTS.tutors.experienceList;
+          payload = {
+            organisationName: formData.organisationName,
+            designation: formData.designation,
+            type: formData.type,
+            startTime: formData.startTime,
+            endTime: formData.endTime
+          };
+          break;
+        case "updateProfileImg":
+          endpoint = API_ENDPOINTS.tutors.uploadProfilePic;
+          payload = {
+            profilePic: formData.newProfilePic
+          };
+          break;
+        case "course":
+          endpoint = API_ENDPOINTS.courses.create;
+          payload = {
+            subject: formData.subject,
+            board: formData.board,
+            className: formData.className,
+            weeklySessions: formData.weeklySessions,
+            costPerSessions: formData.costPerSessions,
+            currency: formData.currency,
+            aboutThisCourse: formData.aboutThisCourse,
+            courseThumbnail: formData.courseThumbnail,
+            language: formData.language,
+            mode: formData.mode
+          };
+          break;
+        default:
+          return;
+      }
+
+      const response = await apiPost(endpoint, payload, { requiresAuth: true });
+      const data = await response.json();
+
+      if (data) {
+        toast.success(`${formType.charAt(0).toUpperCase() + formType.slice(1)} updated successfully`);
+        
+        // Clear form fields
+        setFormData({
+          ...formData,
+          fullAddress: "", 
+          WhatsAppNumber: "", 
+          aboutMe: "", 
+          currentDesignation: "",
+          shortBio: "", 
+          skills: "", 
+          instituteName: "", 
+          courseName: "", 
+          fieldOfStudy: "",
+          startTime: "", 
+          endTime: "", 
+          grade: "", 
+          credentialUrl: "", 
+          organisationName: "",
+          designation: "", 
+          type: "", 
+          newProfilePic: "",
+          subject: "",
+          board: "",
+          className: "",
+          weeklySessions: "",
+          costPerSessions: "",
+          currency: "USD",
+          aboutThisCourse: "",
+          courseThumbnail: "",
+          language: "English",
+          mode: "Online"
+        });
+        
+        // Invalidate and refetch the relevant queries
+        switch (formType) {
+          case "profile":
+            queryClient.invalidateQueries({ queryKey: ["tutorProfile"] });
+            break;
+          case "education":
+            queryClient.invalidateQueries({ queryKey: ["tutorEducation"] });
+            break;
+          case "experience":
+            queryClient.invalidateQueries({ queryKey: ["tutorExperience"] });
+            break;
+          case "course":
+            queryClient.invalidateQueries({ queryKey: ["tutorCourses"] });
+            break;
+          default:
+            break;
+        }
+        
+        setOpenModal(null);
+      }
+    } catch (error) {
+      console.error(`Error updating ${formType}:`, error);
+      toast.error(`Failed to update ${formType}`);
+    }
   };
 
   const handleLogout = () => {
@@ -107,7 +240,8 @@ const Profile = () => {
               openModal={openModal} 
               setOpenModal={setOpenModal} 
               formData={formData} 
-              handleChange={handleChange} 
+              handleChange={handleChange}
+              handleSubmit={handleFormSubmit}
             />
           </div>
         </div>
