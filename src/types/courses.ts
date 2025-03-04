@@ -23,3 +23,35 @@ export interface CourseDetail extends Course {
   location: string;
   aboutMe: string;
 }
+
+export interface Education {
+  _id: {
+    timestamp: number;
+    counter: number;
+    randomValue1: number;
+    randomValue2: number;
+  };
+  teacherId: string;
+  instituteName: string;
+  courseName: string;
+  fieldOfStudy: string;
+  startTime: string;
+  endTime: string;
+  grade: string;
+  credentialUrl: string;
+}
+
+export interface Experience {
+  _id: {
+    timestamp: number;
+    counter: number;
+    randomValue1: number;
+    randomValue2: number;
+  };
+  teacherId: string;
+  organisationName: string;
+  designation: string;
+  type: string;
+  startTime: string;
+  endTime: string;
+}
