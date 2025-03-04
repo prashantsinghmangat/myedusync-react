@@ -1,13 +1,35 @@
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UserRound, GraduationCap, Briefcase, BookOpen, LockKeyhole } from "lucide-react";
+
+// Import all the tab content components
+import { AboutTab } from "@/components/teacher/profile/AboutTab";
+import { EducationTab } from "@/components/teacher/profile/EducationTab";
+import { ExperienceTab } from "@/components/teacher/profile/ExperienceTab";
+import { CoursesTab } from "@/components/teacher/profile/CoursesTab";
+import { SecurityTab } from "@/components/teacher/profile/SecurityTab";
 
 interface TabNavigationProps {
   defaultValue: string;
   onTabChange: (value: string) => void;
+  profileData: any;
+  formData: any;
+  setIsEditProfileOpen: (isOpen: boolean) => void;
+  setIsAddEducationOpen: (isOpen: boolean) => void;
+  setIsAddExperienceOpen: (isOpen: boolean) => void;
+  setIsChangePasswordOpen: (isOpen: boolean) => void;
 }
 
-export const TabNavigation = ({ defaultValue, onTabChange }: TabNavigationProps) => {
+export const TabNavigation = ({ 
+  defaultValue, 
+  onTabChange, 
+  profileData, 
+  formData,
+  setIsEditProfileOpen,
+  setIsAddEducationOpen,
+  setIsAddExperienceOpen,
+  setIsChangePasswordOpen
+}: TabNavigationProps) => {
   return (
     <Tabs defaultValue={defaultValue} onValueChange={onTabChange} className="mb-4">
       <TabsList className="mb-4">
@@ -32,6 +54,27 @@ export const TabNavigation = ({ defaultValue, onTabChange }: TabNavigationProps)
           Security
         </TabsTrigger>
       </TabsList>
+
+      {/* Include the tab content components inside TabsContent */}
+      <TabsContent value="about">
+        <AboutTab profileData={profileData} formData={formData} />
+      </TabsContent>
+
+      <TabsContent value="education">
+        <EducationTab setIsAddEducationOpen={setIsAddEducationOpen} />
+      </TabsContent>
+      
+      <TabsContent value="experience">
+        <ExperienceTab setIsAddExperienceOpen={setIsAddExperienceOpen} />
+      </TabsContent>
+      
+      <TabsContent value="courses">
+        <CoursesTab />
+      </TabsContent>
+      
+      <TabsContent value="security">
+        <SecurityTab setIsChangePasswordOpen={setIsChangePasswordOpen} />
+      </TabsContent>
     </Tabs>
   );
 };

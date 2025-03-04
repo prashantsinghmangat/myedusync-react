@@ -1,9 +1,7 @@
-
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { TabsContent } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINTS } from '@/config/api';
 import { fetchWithInterceptor } from "@/utils/apiInterceptor";
@@ -11,11 +9,6 @@ import { toast } from "sonner";
 
 // Import component tabs
 import { ProfileHeader } from "@/components/teacher/profile/ProfileHeader";
-import { AboutTab } from "@/components/teacher/profile/AboutTab";
-import { EducationTab } from "@/components/teacher/profile/EducationTab";
-import { ExperienceTab } from "@/components/teacher/profile/ExperienceTab";
-import { CoursesTab } from "@/components/teacher/profile/CoursesTab";
-import { SecurityTab } from "@/components/teacher/profile/SecurityTab";
 import { TabNavigation } from "@/components/teacher/profile/TabNavigation";
 
 // Import modals
@@ -174,27 +167,13 @@ const TeacherProfile = () => {
                 <TabNavigation 
                   defaultValue={activeTab} 
                   onTabChange={setActiveTab} 
+                  profileData={profileData?.data}
+                  formData={formData}
+                  setIsEditProfileOpen={setIsEditProfileOpen}
+                  setIsAddEducationOpen={setIsAddEducationOpen}
+                  setIsAddExperienceOpen={setIsAddExperienceOpen}
+                  setIsChangePasswordOpen={setIsChangePasswordOpen}
                 />
-
-                <TabsContent value="about" className={activeTab === "about" ? "block" : "hidden"}>
-                  <AboutTab profileData={profileData?.data} formData={formData} />
-                </TabsContent>
-
-                <TabsContent value="education" className={activeTab === "education" ? "block" : "hidden"}>
-                  <EducationTab setIsAddEducationOpen={setIsAddEducationOpen} />
-                </TabsContent>
-                
-                <TabsContent value="experience" className={activeTab === "experience" ? "block" : "hidden"}>
-                  <ExperienceTab setIsAddExperienceOpen={setIsAddExperienceOpen} />
-                </TabsContent>
-                
-                <TabsContent value="courses" className={activeTab === "courses" ? "block" : "hidden"}>
-                  <CoursesTab />
-                </TabsContent>
-                
-                <TabsContent value="security" className={activeTab === "security" ? "block" : "hidden"}>
-                  <SecurityTab setIsChangePasswordOpen={setIsChangePasswordOpen} />
-                </TabsContent>
               </div>
             </div>
             
