@@ -6,8 +6,13 @@ import { useEffect, useState } from "react";
 import { StudentProfileContent } from "@/components/profile/student/StudentProfileContent";
 import { StudentProfileModals } from "@/components/profile/student/StudentProfileModals";
 import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { API_ENDPOINTS } from "@/config/api";
+import { fetchWithInterceptor } from "@/utils/apiInterceptor";
+
 
 const StudentProfile = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -25,6 +30,36 @@ const StudentProfile = () => {
     confirmNewPassword: ""
   });
 
+  // Fetch profile data
+  const { data: profileData, isLoading: isProfileLoading } = useQuery({
+    queryKey: ["tutorProfile"],
+    queryFn: async () => {
+      try {
+        const response = await fetchWithInterceptor(API_ENDPOINTS.tutors.getTutorProfile, { requiresAuth: true });
+        return await response.json();
+      } catch (error) {
+        console.error("Error fetching tutor profile:", error);
+        return null;
+      }
+    },
+    enabled: !!user
+  });
+
+  useEffect(() => {
+    if (profileData?.data) {
+      setFormData(prev => ({
+        ...prev,
+        name: profileData.data.name || "",
+        email: profileData.data.emailId || "",
+        phone: profileData.data.phoneNumber || "",
+        location: profileData.data.location || "",
+        bio: profileData.data.aboutMe || "",
+        designation: profileData.data.currentDesignation || "",
+        skills: profileData.data.skills || ""
+      }));
+    }
+  }, [profileData]);
+
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (!userData) {
@@ -39,7 +74,7 @@ const StudentProfile = () => {
     }
 
     setUser(parsedUser);
-    
+
     // In a real app, you'd fetch profile data from an API here
     setFormData({
       ...formData,
@@ -70,12 +105,12 @@ const StudentProfile = () => {
 
   const handlePasswordChange = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.newPassword !== formData.confirmNewPassword) {
       toast.error("New passwords don't match");
       return;
     }
-    
+
     // In a real app, you'd send this data to your API
     toast.success("Password changed successfully");
     setIsChangePasswordOpen(false);
@@ -97,7 +132,7 @@ const StudentProfile = () => {
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold text-primary mb-6">My Profile</h1>
 
-            <StudentProfileContent 
+            <StudentProfileContent
               formData={formData}
               setIsEditProfileOpen={setIsEditProfileOpen}
               setIsChangePasswordOpen={setIsChangePasswordOpen}
