@@ -20,17 +20,32 @@ export const MobileNavigation = ({
   const [userRole, setUserRole] = useState<string>("");
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      const userData = JSON.parse(user);
-      setUserRole(userData.role?.toLowerCase() || "");
-    }
+    const checkUserRole = () => {
+      const user = localStorage.getItem("user");
+      if (user) {
+        const userData = JSON.parse(user);
+        setUserRole(userData.role?.toLowerCase() || "");
+      }
+    };
+    
+    // Check on initial load
+    checkUserRole();
+    
+    // Set up event listener for storage changes
+    window.addEventListener("storage", checkUserRole);
+    
+    return () => {
+      window.removeEventListener("storage", checkUserRole);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     toast.success("You have been logged out");
     navigate("/login");
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event("loginStatusChange"));
   };
 
   const getDashboardPath = () => {

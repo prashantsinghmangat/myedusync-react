@@ -23,11 +23,7 @@ const Login = () => {
 
     // Simple validation
     if (!email || !password) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please fill in all fields",
-      });
+      toast.error("Please fill in all fields");
       return;
     }
 
@@ -35,7 +31,6 @@ const Login = () => {
 
     try {
       const response = await fetch(API_ENDPOINTS.auth.login, {
-        // const response = await fetch('https://api.myedusync.com/login', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -66,25 +61,30 @@ const Login = () => {
       }
 
       // Store the token and user data including role
-      localStorage.setItem("user", JSON.stringify({
+      const userData = {
         email,
         userId: data?.data?.userId,
         role: data?.data?.role,
         isLoggedIn: true,
         token: data?.data?.accessToken
-      }));
-
-      toast({
-        title: "Success",
-        description: "You have successfully logged in",
-      });
-      navigate("/profile");
+      };
+      
+      localStorage.setItem("user", JSON.stringify(userData));
+      
+      toast.success("You have successfully logged in");
+      
+      // Redirect based on user role
+      const role = data?.data?.role?.toLowerCase();
+      if (role === "teacher") {
+        navigate("/teacher/dashboard");
+      } else if (role === "student") {
+        navigate("/student/dashboard");
+      } else {
+        // Default fallback if role is undefined or not recognized
+        navigate("/profile");
+      }
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to login",
-      });
+      toast.error(error instanceof Error ? error.message : "Failed to login");
     } finally {
       setIsLoading(false);
     }
