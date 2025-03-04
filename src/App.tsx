@@ -21,6 +21,11 @@ import AddNotes from './pages/AddNotes';
 import BecomeTutor from './pages/BecomeTutor';
 import FindTutorSteps from './pages/FindTutorSteps';
 import FindTutor from './pages/FindTutor';
+import Contact from './pages/Contact';
+import StudentDashboard from './pages/student/Dashboard';
+import StudentProfile from './pages/student/Profile';
+import TeacherDashboard from './pages/teacher/Dashboard';
+import TeacherProfile from './pages/teacher/Profile';
 
 const App = () => {
   return (
@@ -43,6 +48,16 @@ const App = () => {
             <Route path="/become-tutor" element={<BecomeTutor />} />
             <Route path="/find-tutor-steps" element={<FindTutorSteps />} />
             <Route path="/find-tutor" element={<FindTutor />} />
+            <Route path="/contact" element={<Contact />} />
+            
+            {/* Student Routes */}
+            <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route path="/student/profile" element={<StudentProfile />} />
+            
+            {/* Teacher Routes */}
+            <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+            <Route path="/teacher/profile" element={<TeacherProfile />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
