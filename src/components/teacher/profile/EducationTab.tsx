@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Pencil, Trash } from "lucide-react";
+import { Pencil, Trash, Plus } from "lucide-react";
 
 interface EducationTabProps {
   setIsAddEducationOpen: (isOpen: boolean) => void;
