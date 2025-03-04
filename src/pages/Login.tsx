@@ -23,7 +23,11 @@ const Login = () => {
 
     // Simple validation
     if (!email || !password) {
-      toast.error("Please fill in all fields");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields"
+      });
       return;
     }
 
@@ -71,7 +75,10 @@ const Login = () => {
       
       localStorage.setItem("user", JSON.stringify(userData));
       
-      toast.success("You have successfully logged in");
+      toast({
+        title: "Success",
+        description: "You have successfully logged in"
+      });
       
       // Redirect based on user role
       const role = data?.data?.role?.toLowerCase();
@@ -84,7 +91,11 @@ const Login = () => {
         navigate("/profile");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to login");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to login"
+      });
     } finally {
       setIsLoading(false);
     }
