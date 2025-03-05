@@ -22,22 +22,22 @@ const FindTutorSteps = () => {
 
   // Define available options
   const classOptions = [
-    { id: '8', label: 'Class 8' },
-    { id: '9', label: 'Class 9' },
-    { id: '10', label: 'Class 10' },
-    { id: '11', label: 'Class 11' },
-    { id: '12', label: 'Class 12' },
-    { id: 'btech', label: 'B.Tech' },
-    { id: 'bsc', label: 'B.Sc' },
-    { id: 'msc', label: 'M.Sc' },
+    { id: 'Class 8', label: 'Class 8' },
+    { id: 'Class 9', label: 'Class 9' },
+    { id: 'Class 10', label: 'Class 10' },
+    { id: 'Class 11', label: 'Class 11' },
+    { id: 'Class 12', label: 'Class 12' },
+    { id: 'B.Tech', label: 'B.Tech' },
+    { id: 'B.Sc', label: 'B.Sc' },
+    { id: 'M.Sc', label: 'M.Sc' },
   ];
 
   const boardOptions = [
-    { id: 'cbse', label: 'CBSE' },
-    { id: 'icse', label: 'ICSE' },
-    { id: 'igcse', label: 'IGCSE' },
-    { id: 'ib', label: 'IB' },
-    { id: 'state', label: 'State Board' },
+    { id: 'CBSE', label: 'CBSE' },
+    { id: 'ICSE', label: 'ICSE' },
+    { id: 'IGCSE', label: 'IGCSE' },
+    { id: 'IB', label: 'IB' },
+    { id: 'State Board', label: 'State Board' },
   ];
 
   const handleOptionSelect = (category, value) => {
@@ -80,9 +80,9 @@ const FindTutorSteps = () => {
 
           <div className="flex justify-center mb-8">
             <div className="flex items-center">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'}`}>1</div>
-              <div className={`w-16 h-1 ${step >= 2 ? 'bg-primary' : 'bg-gray-200'}`}></div>
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'}`}>2</div>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-accent text-white' : 'bg-gray-200 text-gray-600'}`}>1</div>
+              <div className={`w-16 h-1 ${step >= 2 ? 'bg-accent' : 'bg-gray-200'}`}></div>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-accent text-white' : 'bg-gray-200 text-gray-600'}`}>2</div>
             </div>
           </div>
 
@@ -96,7 +96,7 @@ const FindTutorSteps = () => {
                       {classOptions.map(option => (
                         <div 
                           key={option.id}
-                          className={`border rounded-lg p-4 text-center cursor-pointer hover:border-primary transition ${selectedOptions.class === option.id ? 'border-primary bg-primary/10' : 'border-gray-200'}`}
+                          className={`border rounded-lg p-4 text-center cursor-pointer hover:border-accent transition ${selectedOptions.class === option.id ? 'border-accent bg-accent/10' : 'border-gray-200'}`}
                           onClick={() => handleOptionSelect('class', option.id)}
                         >
                           {option.label}
@@ -115,7 +115,7 @@ const FindTutorSteps = () => {
                       {boardOptions.map(option => (
                         <div 
                           key={option.id}
-                          className={`border rounded-lg p-4 text-center cursor-pointer hover:border-primary transition ${selectedOptions.board === option.id ? 'border-primary bg-primary/10' : 'border-gray-200'}`}
+                          className={`border rounded-lg p-4 text-center cursor-pointer hover:border-accent transition ${selectedOptions.board === option.id ? 'border-accent bg-accent/10' : 'border-gray-200'}`}
                           onClick={() => handleOptionSelect('board', option.id)}
                         >
                           {option.label}
@@ -131,6 +131,7 @@ const FindTutorSteps = () => {
                   {step === 1 ? 'Cancel' : 'Back'}
                 </Button>
                 <Button 
+                  variant="orange"
                   onClick={handleNextStep}
                   disabled={(step === 1 && !selectedOptions.class) || (step === 2 && !selectedOptions.board)}
                 >

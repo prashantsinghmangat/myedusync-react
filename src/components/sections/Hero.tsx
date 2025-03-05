@@ -34,7 +34,7 @@ export const Hero = () => {
                         </div>
 
                         <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-                            <span className="text-orange-500 dark:text-secondary">#Syncing</span><br />
+                            <span className="text-accent dark:text-secondary">#Syncing</span><br />
                             Knowledge <br />
                             Empowering Future <br />
                         </h1>
@@ -61,21 +61,21 @@ export const Hero = () => {
                                             <SelectValue placeholder="Select subject" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="mathematics">Mathematics</SelectItem>
-                                            <SelectItem value="science">Science</SelectItem>
-                                            <SelectItem value="biology">Biology</SelectItem>
-                                            <SelectItem value="chemistry">Chemistry</SelectItem>
-                                            <SelectItem value="physics">Physics</SelectItem>
-                                            <SelectItem value="english">English</SelectItem>
-                                            <SelectItem value="hindi">Hindi</SelectItem>
-                                            <SelectItem value="history">History</SelectItem>
-                                            <SelectItem value="geography">Geography</SelectItem>
+                                            <SelectItem value="Mathematics">Mathematics</SelectItem>
+                                            <SelectItem value="Science">Science</SelectItem>
+                                            <SelectItem value="Biology">Biology</SelectItem>
+                                            <SelectItem value="Chemistry">Chemistry</SelectItem>
+                                            <SelectItem value="Physics">Physics</SelectItem>
+                                            <SelectItem value="English">English</SelectItem>
+                                            <SelectItem value="Hindi">Hindi</SelectItem>
+                                            <SelectItem value="History">History</SelectItem>
+                                            <SelectItem value="Geography">Geography</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
                             <Button 
-                                className="bg-accent hover:bg-accent-hover text-white w-full"
+                                className="bg-accent hover:bg-accent/90 text-white w-full"
                                 onClick={handleSearch}
                             >
                                 Get Started
