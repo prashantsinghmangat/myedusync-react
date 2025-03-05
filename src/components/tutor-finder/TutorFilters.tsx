@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
@@ -69,7 +68,7 @@ export const TutorFilters = ({
                 <SelectValue placeholder="Select subject" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Subjects</SelectItem>
+                <SelectItem value="all-subjects">All Subjects</SelectItem>
                 {subjects.map((s) => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
@@ -84,7 +83,7 @@ export const TutorFilters = ({
                 <SelectValue placeholder="Select class" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Classes</SelectItem>
+                <SelectItem value="all-classes">All Classes</SelectItem>
                 {classes.map((c) => (
                   <SelectItem key={c} value={c}>Class {c}</SelectItem>
                 ))}
@@ -99,7 +98,7 @@ export const TutorFilters = ({
                 <SelectValue placeholder="Select board" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Boards</SelectItem>
+                <SelectItem value="all-boards">All Boards</SelectItem>
                 {boards.map((b) => (
                   <SelectItem key={b} value={b}>{b}</SelectItem>
                 ))}
@@ -114,7 +113,7 @@ export const TutorFilters = ({
                 <SelectValue placeholder="Select mode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Modes</SelectItem>
+                <SelectItem value="all-modes">All Modes</SelectItem>
                 {modes.map((m) => (
                   <SelectItem key={m} value={m}>{m}</SelectItem>
                 ))}
@@ -129,7 +128,7 @@ export const TutorFilters = ({
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Locations</SelectItem>
+                <SelectItem value="all-locations">All Locations</SelectItem>
                 {locations.map((l) => (
                   <SelectItem key={l} value={l}>{l}</SelectItem>
                 ))}
@@ -170,7 +169,7 @@ export const TutorFilters = ({
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Subjects</SelectItem>
+                    <SelectItem value="all-subjects">All Subjects</SelectItem>
                     {subjects.map((s) => (
                       <SelectItem key={s} value={s}>{s}</SelectItem>
                     ))}
@@ -185,7 +184,7 @@ export const TutorFilters = ({
                     <SelectValue placeholder="Select class" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Classes</SelectItem>
+                    <SelectItem value="all-classes">All Classes</SelectItem>
                     {classes.map((c) => (
                       <SelectItem key={c} value={c}>Class {c}</SelectItem>
                     ))}
@@ -200,7 +199,7 @@ export const TutorFilters = ({
                     <SelectValue placeholder="Select board" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Boards</SelectItem>
+                    <SelectItem value="all-boards">All Boards</SelectItem>
                     {boards.map((b) => (
                       <SelectItem key={b} value={b}>{b}</SelectItem>
                     ))}
@@ -215,7 +214,7 @@ export const TutorFilters = ({
                     <SelectValue placeholder="Select mode" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Modes</SelectItem>
+                    <SelectItem value="all-modes">All Modes</SelectItem>
                     {modes.map((m) => (
                       <SelectItem key={m} value={m}>{m}</SelectItem>
                     ))}
@@ -230,7 +229,7 @@ export const TutorFilters = ({
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Locations</SelectItem>
+                    <SelectItem value="all-locations">All Locations</SelectItem>
                     {locations.map((l) => (
                       <SelectItem key={l} value={l}>{l}</SelectItem>
                     ))}
@@ -254,42 +253,42 @@ export const TutorFilters = ({
       {/* Active filters display */}
       {(subject || classLevel || board || mode || location) && (
         <div className="flex flex-wrap gap-2 mt-4">
-          {subject && (
+          {subject && subject !== "all-subjects" && (
             <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
               Subject: {subject}
-              <button onClick={() => setSubject('')} className="ml-1 focus:outline-none">
+              <button onClick={() => setSubject('all-subjects')} className="ml-1 focus:outline-none">
                 <X className="h-3 w-3" />
               </button>
             </div>
           )}
-          {classLevel && (
+          {classLevel && classLevel !== "all-classes" && (
             <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
               Class: {classLevel}
-              <button onClick={() => setClassLevel('')} className="ml-1 focus:outline-none">
+              <button onClick={() => setClassLevel('all-classes')} className="ml-1 focus:outline-none">
                 <X className="h-3 w-3" />
               </button>
             </div>
           )}
-          {board && (
+          {board && board !== "all-boards" && (
             <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
               Board: {board}
-              <button onClick={() => setBoard('')} className="ml-1 focus:outline-none">
+              <button onClick={() => setBoard('all-boards')} className="ml-1 focus:outline-none">
                 <X className="h-3 w-3" />
               </button>
             </div>
           )}
-          {mode && (
+          {mode && mode !== "all-modes" && (
             <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
               Mode: {mode}
-              <button onClick={() => setMode('')} className="ml-1 focus:outline-none">
+              <button onClick={() => setMode('all-modes')} className="ml-1 focus:outline-none">
                 <X className="h-3 w-3" />
               </button>
             </div>
           )}
-          {location && (
+          {location && location !== "all-locations" && (
             <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
               Location: {location}
-              <button onClick={() => setLocation('')} className="ml-1 focus:outline-none">
+              <button onClick={() => setLocation('all-locations')} className="ml-1 focus:outline-none">
                 <X className="h-3 w-3" />
               </button>
             </div>

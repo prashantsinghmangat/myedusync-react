@@ -57,13 +57,13 @@ const NotFound = () => {
             </p>
             
             <form onSubmit={handleSearch} className="relative max-w-md mt-8">
-              <Input
+              {/* <Input
                 type="text"
                 placeholder="Search"
                 className="pr-10 shadow-md"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-              />
+              /> */}
               <button 
                 type="submit"
                 className="absolute right-3 top-1/2 -translate-y-1/2"
