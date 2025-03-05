@@ -1,14 +1,29 @@
 
+import { useNavigate } from 'react-router-dom';
 import { TutorCard } from "./TutorCard";
 import { Card } from "@/components/ui/card";
-import { Course } from "@/types/courses";
+
+export interface Tutor {
+  _id: string;
+  name: string;
+  location: string;
+  profilePic: string;
+  currentDesignation: string;
+  shortBio?: string;
+  skills?: string;
+  boards?: string;
+  classes?: string;
+  subjects?: string;
+}
 
 interface TutorGridProps {
-  tutors: Course[];
+  tutors: Tutor[];
   loading: boolean;
 }
 
 export const TutorGrid = ({ tutors, loading }: TutorGridProps) => {
+  const navigate = useNavigate();
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

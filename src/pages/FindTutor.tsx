@@ -7,9 +7,8 @@ import { SEO } from "@/components/SEO";
 import { useLoading } from "@/providers/LoadingProvider";
 import { toast } from "sonner";
 import { apiGet } from "@/utils/apiInterceptor";
-import { Course } from "@/types/courses";
 import { TutorFilters } from "@/components/tutor-finder/TutorFilters";
-import { TutorGrid } from "@/components/tutor-finder/TutorGrid";
+import { TutorGrid, Tutor } from "@/components/tutor-finder/TutorGrid";
 
 const FindTutor = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,7 +22,7 @@ const FindTutor = () => {
   const [location, setLocation] = useState(searchParams.get('location') || '');
   
   // Results state
-  const [tutors, setTutors] = useState<Course[]>([]);
+  const [tutors, setTutors] = useState<Tutor[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -41,12 +40,13 @@ const FindTutor = () => {
         if (mode) params.append('mode', mode);
         if (location) params.append('location', location);
         
-        const url = `https://api.myedusync.com/find-tutor?${params.toString()}&page=0&limit=10`;
+        // Use the new API endpoint
+        const url = `https://api.myedusync.com/getTutorList?${params.toString()}`;
         const response = await apiGet(url);
-        const data = await response.json();
+        const responseData = await response.json();
         
-        if (data && Array.isArray(data)) {
-          setTutors(data);
+        if (responseData && responseData.isSuccess && Array.isArray(responseData.data)) {
+          setTutors(responseData.data);
         } else {
           setTutors([]);
           toast.error("Failed to load tutors");

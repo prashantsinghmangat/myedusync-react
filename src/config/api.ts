@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
     educationList: `${API_BASE_URL}/allTutorEducationList`,
     experienceList: `${API_BASE_URL}/allTutorExperienceList`,
     find: `${API_BASE_URL}/find-tutor`,
+    getTutorList: `${API_BASE_URL}/getTutorList`,
     uploadProfilePic: `${API_BASE_URL}/uploadTutorProfilePic`,
     updateEducation: `${API_BASE_URL}/updateTutorEducation`,
     updateExperience: `${API_BASE_URL}/updateTutorExperience`,
