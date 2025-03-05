@@ -1,16 +1,9 @@
 
 import { Link, useNavigate } from "react-router-dom";
-import { PenTool, BookOpen, LogOut } from "lucide-react";
+import { PenTool, BookOpen, LogOut, LayoutDashboard, User, MessageCircle } from "lucide-react";
 import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
 
 interface MobileNavigationProps {
   isLoggedIn: boolean;
@@ -24,11 +17,43 @@ export const MobileNavigation = ({
   isMobileMenuOpen 
 }: MobileNavigationProps) => {
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState<string>("");
+
+  useEffect(() => {
+    const checkUserRole = () => {
+      const user = localStorage.getItem("user");
+      if (user) {
+        const userData = JSON.parse(user);
+        setUserRole(userData.role?.toLowerCase() || "");
+      }
+    };
+    
+    // Check on initial load
+    checkUserRole();
+    
+    // Set up event listener for storage changes
+    window.addEventListener("storage", checkUserRole);
+    
+    return () => {
+      window.removeEventListener("storage", checkUserRole);
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     toast.success("You have been logged out");
     navigate("/login");
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event("loginStatusChange"));
+  };
+
+  const getDashboardPath = () => {
+    return userRole === "teacher" ? "/teacher/dashboard" : "/student/dashboard";
+  };
+
+  const getProfilePath = () => {
+    return userRole === "teacher" ? "/teacher/profile" : "/student/profile";
   };
 
   if (!isMobileMenuOpen) {
@@ -68,8 +93,17 @@ export const MobileNavigation = ({
         )}
         {isLoggedIn ? (
           <>
-            <Link to="/profile" className="text-gray-600 hover:text-accent transition-colors py-2">
+            <Link to={getDashboardPath()} className="text-gray-600 hover:text-accent transition-colors py-2 flex items-center gap-2">
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </Link>
+            <Link to={getProfilePath()} className="text-gray-600 hover:text-accent transition-colors py-2 flex items-center gap-2">
+              <User className="h-4 w-4" />
               Profile
+            </Link>
+            <Link to="/contact" className="text-gray-600 hover:text-accent transition-colors py-2 flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" />
+              Contact Us
             </Link>
             <button
               onClick={handleLogout}

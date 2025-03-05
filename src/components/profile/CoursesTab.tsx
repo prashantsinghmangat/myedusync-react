@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { API_ENDPOINTS } from "@/config/api";
-import { apiGet } from "@/utils/apiInterceptor";
+import { fetchWithInterceptor } from "@/utils/apiInterceptor";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Course } from "@/types/courses";
@@ -19,13 +19,13 @@ export const CoursesTab = ({ setOpenModal }: CoursesTabProps) => {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const response = await apiGet(API_ENDPOINTS.courses.tutorCourses, {
+      const response = await fetchWithInterceptor(API_ENDPOINTS.courses.tutorCourses, {
         requiresAuth: true,
       });
       
       const data = await response.json();
-      if (data?.success && data?.data) {
-        setCourses(data.data);
+      if (data) {
+        setCourses(data);
       }
     } catch (error) {
       console.error("Error fetching courses:", error);

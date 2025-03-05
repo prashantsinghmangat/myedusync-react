@@ -14,30 +14,32 @@ export const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      const userData = JSON.parse(user);
-      setIsLoggedIn(true);
-      setIsTeacher(userData.role === "Teacher");
-    } else {
-      setIsLoggedIn(false);
-      setIsTeacher(false);
-    }
-
-    const handleStorageChange = () => {
+    const checkUserStatus = () => {
       const user = localStorage.getItem("user");
       if (user) {
         const userData = JSON.parse(user);
-        setIsLoggedIn(true);
-        setIsTeacher(userData.role === "Teacher");
+        setIsLoggedIn(!!userData.isLoggedIn);
+        setIsTeacher(userData.role?.toLowerCase() === "teacher");
       } else {
         setIsLoggedIn(false);
         setIsTeacher(false);
       }
     };
 
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    // Check on initial load
+    checkUserStatus();
+
+    // Set up event listener for storage changes
+    window.addEventListener("storage", checkUserStatus);
+    
+    // Custom event for login status changes within the app
+    const handleLoginChange = () => checkUserStatus();
+    window.addEventListener("loginStatusChange", handleLoginChange);
+
+    return () => {
+      window.removeEventListener("storage", checkUserStatus);
+      window.removeEventListener("loginStatusChange", handleLoginChange);
+    };
   }, []);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
