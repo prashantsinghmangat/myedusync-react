@@ -31,31 +31,30 @@ export const TabNavigation = ({
   setIsChangePasswordOpen
 }: TabNavigationProps) => {
   return (
-    <Tabs defaultValue={defaultValue} onValueChange={onTabChange} className="mb-4">
-      <TabsList className="mb-4">
-        <TabsTrigger value="about">
+    <Tabs defaultValue={defaultValue} onValueChange={onTabChange} className="w-full">
+      <TabsList className="mb-4 w-full justify-start overflow-x-auto">
+        <TabsTrigger value="about" className="px-4">
           <UserRound className="h-4 w-4 mr-2" />
           About
         </TabsTrigger>
-        <TabsTrigger value="education">
+        <TabsTrigger value="education" className="px-4">
           <GraduationCap className="h-4 w-4 mr-2" />
           Education
         </TabsTrigger>
-        <TabsTrigger value="experience">
+        <TabsTrigger value="experience" className="px-4">
           <Briefcase className="h-4 w-4 mr-2" />
           Experience
         </TabsTrigger>
-        <TabsTrigger value="courses">
+        <TabsTrigger value="courses" className="px-4">
           <BookOpen className="h-4 w-4 mr-2" />
           Courses
         </TabsTrigger>
-        <TabsTrigger value="security">
+        <TabsTrigger value="security" className="px-4">
           <LockKeyhole className="h-4 w-4 mr-2" />
           Security
         </TabsTrigger>
       </TabsList>
 
-      {/* Include the tab content components inside TabsContent */}
       <TabsContent value="about">
         <AboutTab profileData={profileData} formData={formData} />
       </TabsContent>

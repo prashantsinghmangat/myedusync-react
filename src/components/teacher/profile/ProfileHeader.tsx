@@ -12,10 +12,10 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader = ({ profileData, formData, setIsEditProfileOpen }: ProfileHeaderProps) => {
   return (
-    <Card>
+    <Card className="h-fit">
       <CardContent className="pt-6 flex flex-col items-center">
         <div className="relative">
-          <Avatar className="h-32 w-32 border-4 border-white shadow-md mb-4">
+          <Avatar className="h-28 w-28 sm:h-32 sm:w-32 border-4 border-white shadow-md mb-4">
             <AvatarImage src={profileData?.profilePic || "https://i.pravatar.cc/150?img=12"} />
             <AvatarFallback>{profileData?.name?.[0] || "T"}</AvatarFallback>
           </Avatar>
@@ -36,13 +36,13 @@ export const ProfileHeader = ({ profileData, formData, setIsEditProfileOpen }: P
           <span className="text-sm ml-1">5.0</span>
         </div>
         <Button 
-          variant="outline" 
+          variant="blue" 
           className="w-full mb-2"
           onClick={() => setIsEditProfileOpen(true)}
         >
           Edit Profile
         </Button>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full bg-white hover:bg-gray-50">
           Preview Public Profile
         </Button>
       </CardContent>

@@ -45,7 +45,7 @@ export const Header = () => {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
-    <header className="fixed w-full top-0 z-50 bg-background/95 backdrop-blur-md border-b shadow-sm">
+    <header className="fixed w-full top-0 z-50 bg-background shadow-sm border-b">
       <div className="max-w-[2000px] mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <Logo />
