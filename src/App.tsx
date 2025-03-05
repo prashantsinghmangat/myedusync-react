@@ -21,6 +21,8 @@ import AddNotes from './pages/AddNotes';
 import BecomeTutor from './pages/BecomeTutor';
 import FindTutorSteps from './pages/FindTutorSteps';
 import FindTutor from './pages/FindTutor';
+import TutorFinder from './pages/TutorFinder';
+import TutorDetail from './pages/TutorDetail';
 import Contact from './pages/Contact';
 import StudentDashboard from './pages/student/Dashboard';
 import StudentProfile from './pages/student/Profile';
@@ -48,6 +50,8 @@ const App = () => {
             <Route path="/become-tutor" element={<BecomeTutor />} />
             <Route path="/find-tutor-steps" element={<FindTutorSteps />} />
             <Route path="/find-tutor" element={<FindTutor />} />
+            <Route path="/tutor-finder" element={<TutorFinder />} />
+            <Route path="/tutor/:id" element={<TutorDetail />} />
             <Route path="/contact" element={<Contact />} />
             
             {/* Student Routes */}

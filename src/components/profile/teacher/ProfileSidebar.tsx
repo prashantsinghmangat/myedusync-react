@@ -41,7 +41,7 @@ export const ProfileSidebar = ({
           <span className="text-sm ml-1">5.0</span>
         </div>
         <Button
-          variant="blue"
+          variant="orange"
           className="w-full mb-2"
           onClick={() => setIsEditProfileOpen(true)}
         >
