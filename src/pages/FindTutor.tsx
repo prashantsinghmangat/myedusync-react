@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Header } from "@/components/Header";
@@ -11,6 +12,7 @@ import { TutorGrid, Tutor } from "@/components/tutor-finder/TutorGrid";
 import { Button } from "@/components/ui/button";
 import { Star, Filter, Grid, List, Phone } from "lucide-react";
 import { generateStructuredData } from "@/utils/seo";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 const FindTutor = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,6 +24,11 @@ const FindTutor = () => {
   const [board, setBoard] = useState(searchParams.get('board') || 'all-boards');
   const [mode, setMode] = useState(searchParams.get('mode') || 'all-modes');
   const [location, setLocation] = useState(searchParams.get('location') || 'all-locations');
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '0'));
+  const [totalPages, setTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 10;
   
   // Results state
   const [tutors, setTutors] = useState<Tutor[]>([]);
@@ -86,7 +93,11 @@ const FindTutor = () => {
         if (mode && mode !== 'all-modes') params.append('mode', mode);
         if (location && location !== 'all-locations') params.append('location', location);
         
-        // Use the new API endpoint
+        // Add pagination params
+        params.append('page', currentPage.toString());
+        params.append('limit', ITEMS_PER_PAGE.toString());
+        
+        // Use the API endpoint
         const url = `https://api.myedusync.com/getTutorList?${params.toString()}`;
         const response = await apiGet(url);
         const responseData = await response.json();
@@ -102,6 +113,10 @@ const FindTutor = () => {
             responseTime: Math.random() > 0.3 ? 'quick' : undefined
           }));
           setTutors(enhancedData);
+          
+          // Set total pages based on total count if available, otherwise estimate
+          const totalCount = responseData.totalCount || enhancedData.length * 3; // Fallback if totalCount not provided
+          setTotalPages(Math.ceil(totalCount / ITEMS_PER_PAGE));
         } else {
           setTutors([]);
           toast.error("Failed to load tutors");
@@ -117,7 +132,7 @@ const FindTutor = () => {
     };
 
     fetchTutors();
-  }, [subject, classLevel, board, mode, location, setIsLoading]);
+  }, [subject, classLevel, board, mode, location, currentPage, setIsLoading]);
 
   // Apply filters and update URL
   const applyFilters = () => {
@@ -127,6 +142,10 @@ const FindTutor = () => {
     if (board && board !== 'all-boards') params.append('board', board);
     if (mode && mode !== 'all-modes') params.append('mode', mode);
     if (location && location !== 'all-locations') params.append('location', location);
+    
+    // Reset page to 0 when filters change
+    setCurrentPage(0);
+    params.append('page', '0');
     
     setSearchParams(params);
     setIsFilterOpen(false);
@@ -139,7 +158,17 @@ const FindTutor = () => {
     setBoard('all-boards');
     setMode('all-modes');
     setLocation('all-locations');
+    setCurrentPage(0);
     setSearchParams({});
+  };
+
+  // Handle page changes
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    
+    const params = new URLSearchParams(searchParams);
+    params.set('page', page.toString());
+    setSearchParams(params);
   };
 
   return (
@@ -227,10 +256,13 @@ const FindTutor = () => {
                   />
                 </div>
                 
-                <div className="col-span-3 lg:col-span-1 flex items-end">
+                <div className="col-span-2 lg:col-span-1 flex items-end gap-2">
                   <Button variant="outline" className="w-full" onClick={() => setIsFilterOpen(true)}>
                     <Filter className="h-4 w-4 mr-2" />
                     More filters
+                  </Button>
+                  <Button variant="outline" className="w-full" onClick={resetFilters}>
+                    Clear filters
                   </Button>
                 </div>
                 
@@ -259,6 +291,9 @@ const FindTutor = () => {
                 <Button variant="outline" className="flex-1 mr-2" onClick={() => setIsFilterOpen(true)}>
                   <Filter className="h-4 w-4 mr-2" />
                   Filters
+                </Button>
+                <Button variant="outline" onClick={resetFilters} className="mr-2">
+                  Clear
                 </Button>
                 <div className="flex gap-2">
                   <Button 
@@ -311,6 +346,43 @@ const FindTutor = () => {
 
                 {/* Tutor Grid Component */}
                 <TutorGrid tutors={tutors} loading={loading} view={viewMode} />
+                
+                {/* Pagination */}
+                {!loading && tutors.length > 0 && totalPages > 1 && (
+                  <div className="mt-8">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => currentPage > 0 && handlePageChange(currentPage - 1)}
+                            className={currentPage === 0 ? 'pointer-events-none opacity-50' : ''}
+                          />
+                        </PaginationItem>
+                        
+                        {Array.from({ length: Math.min(5, totalPages) }).map((_, idx) => {
+                          // For simplicity, show first 5 pages. In a real app, you'd calculate visible pages around current page
+                          return (
+                            <PaginationItem key={idx}>
+                              <PaginationLink 
+                                isActive={currentPage === idx}
+                                onClick={() => handlePageChange(idx)}
+                              >
+                                {idx + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        })}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => currentPage < totalPages - 1 && handlePageChange(currentPage + 1)}
+                            className={currentPage >= totalPages - 1 ? 'pointer-events-none opacity-50' : ''}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
               </div>
               
               {/* Right Sidebar */}

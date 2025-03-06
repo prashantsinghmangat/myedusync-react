@@ -6,16 +6,22 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle, PlayCircle } from "lucide-react";
-import { Accordion, AccordionItem } from "@/components/ui/accordion";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { apiGet } from "@/utils/apiInterceptor";
 import { useEffect } from "react";
 import { useLoading } from "@/providers/LoadingProvider";
+import { SEO } from "@/components/SEO";
+import { generateStructuredData } from "@/utils/seo";
+import { useNavigate } from "react-router-dom";
+import { Course } from "@/types/courses";
 
 const CourseDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { setIsLoading } = useLoading();
 
+  // Fetch course details
   const { data: courseData, isLoading } = useQuery({
     queryKey: ["course", id],
     queryFn: async () => {
@@ -31,9 +37,56 @@ const CourseDetail = () => {
     },
   });
 
+  // Fetch related courses based on this course's board, class, and subject
+  const { data: relatedCourses = [] } = useQuery({
+    queryKey: ["relatedCourses", courseData?.board, courseData?.className, courseData?.subject],
+    queryFn: async () => {
+      if (!courseData) return [];
+      
+      const params = new URLSearchParams();
+      params.append('board', courseData.board);
+      params.append('class', courseData.className);
+      params.append('subject', courseData.subject);
+      params.append('limit', '3'); // Limit to 3 related courses
+      
+      const response = await apiGet(
+        `https://api.myedusync.com/courses?${params.toString()}`,
+        {
+          requiresAuth: true
+        }
+      );
+
+      const data = await response.json();
+      // Filter out the current course from related courses
+      return (data?.data || []).filter((course: Course) => course._id !== id);
+    },
+    // Only fetch related courses once we have the course data
+    enabled: !!courseData,
+  });
+
   useEffect(() => {
     setIsLoading(isLoading);
   }, [isLoading, setIsLoading]);
+
+  // Generate structured data for SEO
+  const courseStructuredData = courseData ? generateStructuredData('Course', {
+    name: `${courseData.subject} for ${courseData.className}`,
+    description: courseData.aboutThisCourse,
+    provider: {
+      '@type': 'Organization',
+      name: 'MyEduSync',
+      url: 'https://myedusync.com'
+    },
+    courseCode: courseData._id,
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: courseData.mode,
+      instructor: {
+        '@type': 'Person',
+        name: courseData.name
+      }
+    }
+  }) : null;
 
   if (!courseData && !isLoading) {
     return (
@@ -49,6 +102,11 @@ const CourseDetail = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title={courseData ? `${courseData.subject} Course | Class ${courseData.className}` : 'Course Details'}
+        description={courseData ? `Learn ${courseData.subject} for ${courseData.board} Class ${courseData.className} with ${courseData.name}` : ''}
+        structuredData={courseStructuredData}
+      />
       <Header />
       <div className="min-h-screen bg-gray-50 pt-20">
         {courseData && (
@@ -64,7 +122,6 @@ const CourseDetail = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                    
-
                     {/* Course Info */}
                     <h3 className="text-xl font-semibold">Course Information</h3>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700">
@@ -112,12 +169,38 @@ const CourseDetail = () => {
                         .slice(8) // The remaining part as curriculum
                         .map((lesson, index) => (
                           <AccordionItem key={index} value={`lesson-${index}`}>
-                            {lesson}
+                            <AccordionTrigger>{`Lesson ${index + 1}: ${lesson.substring(0, 30)}...`}</AccordionTrigger>
+                            <AccordionContent>{lesson}</AccordionContent>
                           </AccordionItem>
                         ))}
                     </Accordion>
                   </CardContent>
                 </Card>
+                
+                {/* Related Courses */}
+                {relatedCourses.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-xl font-semibold">Related Courses</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {relatedCourses.map((course: Course) => (
+                          <Card key={course._id} className="cursor-pointer hover:shadow-sm" onClick={() => navigate(`/courses/${course._id}`)}>
+                            <div className="p-4">
+                              <h4 className="font-semibold">{course.subject}</h4>
+                              <p className="text-sm text-gray-600">Class {course.className}</p>
+                              <p className="text-sm text-gray-600">{course.board}</p>
+                              <p className="text-primary text-sm mt-2 font-medium">
+                                {course.costPerSessions} {course.currency}/session
+                              </p>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
 
               {/* RIGHT - Side Panel */}
