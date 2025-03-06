@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -28,10 +27,23 @@ const Notes = () => {
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ['notes', selectedBoard, selectedClass, selectedSubject],
     queryFn: async () => {
-      const url = selectedBoard === "SelectBoard" || !selectedClass || !selectedSubject
-        ? `${API_ENDPOINTS.notes.list}?page=0&limit=10`
-        : `${API_ENDPOINTS.notes.list}?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
-
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', '0');
+      queryParams.append('limit', '10');
+      
+      if (selectedBoard && selectedBoard !== "SelectBoard") {
+        queryParams.append('board', selectedBoard);
+      }
+      
+      if (selectedClass) {
+        queryParams.append('class', selectedClass.toString());
+      }
+      
+      if (selectedSubject) {
+        queryParams.append('subject', selectedSubject);
+      }
+      
+      const url = `${API_ENDPOINTS.notes.list}?${queryParams.toString()}`;
       console.log("Fetching notes from:", url); // Debugging API URL
 
       try {
@@ -92,7 +104,6 @@ const Notes = () => {
   };
 
   const handleNoteClick = (noteId: string) => {
-    // Navigate to note detail page with ID instead of passing note in state
     navigate(`/notes/${noteId}`);
   };
 
@@ -108,7 +119,6 @@ const Notes = () => {
           <h1 className="text-4xl font-bold text-primary mb-8">Study Notes</h1>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Board Selection */}
             <div className="space-y-2">
               <Label htmlFor="board-select">Board</Label>
               <Select onValueChange={handleBoardChange} value={selectedBoard}>
@@ -116,14 +126,15 @@ const Notes = () => {
                   <SelectValue placeholder="Select Board" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="SelectBoard">All Boards</SelectItem>
                   <SelectItem value="CBSE">CBSE</SelectItem>
                   <SelectItem value="ICSE">ICSE</SelectItem>
                   <SelectItem value="UPBoard">UP Board</SelectItem>
+                  <SelectItem value="CentralUniversity">Central University</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Class Selection */}
             <div className="space-y-2">
               <Label htmlFor="class-select">Class</Label>
               <Select
@@ -143,7 +154,6 @@ const Notes = () => {
               </Select>
             </div>
 
-            {/* Subject Selection */}
             <div className="space-y-2">
               <Label htmlFor="subject-select">Subject</Label>
               <Select
@@ -164,7 +174,6 @@ const Notes = () => {
             </div>
           </div>
 
-          {/* Latest Notes Section */}
           <section className="py-20">
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-center mb-12">Latest Study Notes</h2>

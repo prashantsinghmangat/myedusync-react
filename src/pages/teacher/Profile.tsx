@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
@@ -16,17 +15,17 @@ import {
   GraduationCap, 
   Briefcase, 
   LockKeyhole,
+  BookOpenCheck
 } from "lucide-react";
 
-// Import refactored components
 import { ProfileSidebar } from "@/components/profile/teacher/ProfileSidebar";
 import { AboutTab } from "@/components/profile/teacher/AboutTab";
 import { EducationTabContent } from "@/components/profile/teacher/EducationTabContent";
 import { ExperienceTabContent } from "@/components/profile/teacher/ExperienceTabContent";
 import { CoursesTabContent } from "@/components/profile/teacher/CoursesTabContent";
 import { SecurityTabContent } from "@/components/profile/teacher/SecurityTabContent";
+import { OfferingTabContent } from "@/components/profile/teacher/OfferingTabContent";
 
-// Import modals
 import { EditProfileModal } from "@/components/profile/teacher/modals/EditProfileModal";
 import { AddEducationModal } from "@/components/profile/teacher/modals/AddEducationModal";
 import { AddExperienceModal } from "@/components/profile/teacher/modals/AddExperienceModal";
@@ -79,10 +78,12 @@ const TeacherProfile = () => {
     language: "English",
     mode: "Online",
     courseThumbnail: "",
-    profilePic: ""
+    profilePic: "",
+    boards: "",
+    classes: "",
+    subjects: ""
   });
 
-  // Fetch profile data
   const { data: profileData, isLoading: isProfileLoading } = useQuery({
     queryKey: ["tutorProfile"],
     queryFn: async () => {
@@ -97,7 +98,6 @@ const TeacherProfile = () => {
     enabled: !!user
   });
 
-  // Fetch education data
   const { data: educationList = [], isLoading: isEducationLoading, refetch: refetchEducation } = useQuery({
     queryKey: ["tutorEducation"],
     queryFn: async () => {
@@ -113,7 +113,6 @@ const TeacherProfile = () => {
     enabled: activeTab === "education" && !!user
   });
 
-  // Fetch experience data
   const { data: experienceList = [], isLoading: isExperienceLoading, refetch: refetchExperience } = useQuery({
     queryKey: ["tutorExperience"],
     queryFn: async () => {
@@ -129,7 +128,6 @@ const TeacherProfile = () => {
     enabled: activeTab === "experience" && !!user
   });
 
-  // Fetch courses data
   const { data: coursesList = [], isLoading: isCoursesLoading, refetch: refetchCourses } = useQuery({
     queryKey: ["tutorCourses"],
     queryFn: async () => {
@@ -171,7 +169,10 @@ const TeacherProfile = () => {
         location: profileData.data.location || "",
         bio: profileData.data.aboutMe || "",
         designation: profileData.data.currentDesignation || "",
-        skills: profileData.data.skills || ""
+        skills: profileData.data.skills || "",
+        boards: profileData.data.boards || "",
+        classes: profileData.data.classes || "",
+        subjects: profileData.data.subjects || ""
       }));
     }
   }, [profileData]);
@@ -187,7 +188,6 @@ const TeacherProfile = () => {
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     
-    // Trigger refetch based on active tab
     if (value === "education") {
       refetchEducation();
     } else if (value === "experience") {
@@ -241,7 +241,6 @@ const TeacherProfile = () => {
         toast.success("Education added successfully");
         queryClient.invalidateQueries({ queryKey: ["tutorEducation"] });
         setIsAddEducationOpen(false);
-        // Reset form data
         setFormData(prev => ({
           ...prev,
           instituteName: "",
@@ -278,7 +277,6 @@ const TeacherProfile = () => {
         toast.success("Experience added successfully");
         queryClient.invalidateQueries({ queryKey: ["tutorExperience"] });
         setIsAddExperienceOpen(false);
-        // Reset form data
         setFormData(prev => ({
           ...prev,
           companyName: "",
@@ -356,7 +354,6 @@ const TeacherProfile = () => {
         toast.success("Course added successfully");
         queryClient.invalidateQueries({ queryKey: ["tutorCourses"] });
         setIsAddCourseOpen(false);
-        // Reset form data
         setFormData(prev => ({
           ...prev,
           subject: "",
@@ -376,6 +373,32 @@ const TeacherProfile = () => {
     } catch (error) {
       console.error("Error adding course:", error);
       toast.error("An error occurred while adding course");
+    }
+  };
+
+  const handleSaveOfferings = async (offeringData: { boards: string, classes: string, subjects: string }) => {
+    try {
+      const response = await apiPost(API_ENDPOINTS.tutors.addTutorBasicDetails, {
+        currentDesignation: profileData?.data?.currentDesignation || "",
+        shortBio: profileData?.data?.shortBio || "",
+        aboutMe: profileData?.data?.aboutMe || "",
+        skills: profileData?.data?.skills || "",
+        WhatsAppNumber: profileData?.data?.WhatsAppNumber || "",
+        FullAdddress: profileData?.data?.FullAdddress || "",
+        boards: offeringData.boards,
+        classes: offeringData.classes,
+        subjects: offeringData.subjects
+      }, { requiresAuth: true });
+      
+      if (response.ok) {
+        toast.success("Offerings updated successfully");
+        queryClient.invalidateQueries({ queryKey: ["tutorProfile"] });
+      } else {
+        toast.error("Failed to update offerings");
+      }
+    } catch (error) {
+      console.error("Error updating offerings:", error);
+      toast.error("An error occurred while updating offerings");
     }
   };
 
@@ -486,7 +509,7 @@ const TeacherProfile = () => {
               />
 
               <Tabs defaultValue="about" value={activeTab} onValueChange={handleTabChange}>
-                <TabsList className="mb-4">
+                <TabsList className="mb-4 grid grid-cols-3 md:grid-cols-6">
                   <TabsTrigger value="about">
                     <UserRound className="h-4 w-4 mr-2" />
                     About
@@ -502,6 +525,10 @@ const TeacherProfile = () => {
                   <TabsTrigger value="courses">
                     <BookOpen className="h-4 w-4 mr-2" />
                     Courses
+                  </TabsTrigger>
+                  <TabsTrigger value="offerings">
+                    <BookOpenCheck className="h-4 w-4 mr-2" />
+                    Offerings
                   </TabsTrigger>
                   <TabsTrigger value="security">
                     <LockKeyhole className="h-4 w-4 mr-2" />
@@ -543,6 +570,14 @@ const TeacherProfile = () => {
                   />
                 </TabsContent>
                 
+                <TabsContent value="offerings">
+                  <OfferingTabContent 
+                    profileData={profileData}
+                    isLoading={isProfileLoading}
+                    onSaveOfferings={handleSaveOfferings}
+                  />
+                </TabsContent>
+                
                 <TabsContent value="security">
                   <SecurityTabContent 
                     setIsChangePasswordOpen={setIsChangePasswordOpen}
@@ -554,7 +589,6 @@ const TeacherProfile = () => {
         </div>
       </main>
 
-      {/* Modals */}
       <EditProfileModal 
         isOpen={isEditProfileOpen}
         onOpenChange={setIsEditProfileOpen}

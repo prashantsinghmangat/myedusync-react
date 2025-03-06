@@ -14,7 +14,15 @@ export const LatestNotes = () => {
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ['latestNotes'],
     queryFn: async () => {
-      const response = await apiGet(API_ENDPOINTS.notes.list + '?page=0&limit=10', {
+      // Build URL with query parameters
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', '0');
+      queryParams.append('limit', '10');
+      
+      const url = `${API_ENDPOINTS.notes.list}?${queryParams.toString()}`;
+      console.log("Fetching latest notes from:", url);
+      
+      const response = await apiGet(url, {
         requiresAuth: true,
       });
 
