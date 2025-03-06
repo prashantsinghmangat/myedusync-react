@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -14,12 +15,12 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Label } from "@/components/ui/label";
 import { API_ENDPOINTS } from "@/config/api";
-import { useLoading } from "@/providers/LoadingProvider";
 import { apiGet } from "@/utils/apiInterceptor";
+import { SEO } from "@/components/SEO";
+import { NoteCardSkeleton } from "@/components/notes/NoteCardSkeleton";
 
 const Notes = () => {
   const navigate = useNavigate();
-  const { setIsLoading } = useLoading();
   const [selectedBoard, setSelectedBoard] = useState<Board>("SelectBoard");
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -48,32 +49,6 @@ const Notes = () => {
     refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
-
-  // const { data: notes = [], isLoading } = useQuery({
-  //   queryKey: ['notes', selectedBoard, selectedClass, selectedSubject],
-  //   queryFn: async () => {
-  //     // Use isomorphic fetch that works in both browser and server environments
-  //     const url = selectedBoard === "SelectBoard" || !selectedClass || !selectedSubject
-  //       ? `${API_ENDPOINTS.notes.list}?page=0&limit=10`
-  //       : `${API_ENDPOINTS.notes.list}?page=0&limit=10&board=${selectedBoard}&class=${selectedClass}&subject=${selectedSubject}`;
-
-  //     const response = await apiGet(url, {
-  //       requiresAuth: true
-  //     });
-
-  //     const responseData = await response.json();
-  //     return responseData.data || [];
-  //   },
-  //   // Add SSR options
-  //   initialData: [],
-  //   refetchOnMount: true,
-  //   refetchOnWindowFocus: false,
-  // });
-
-  // Show global loader during API calls
-  useEffect(() => {
-    setIsLoading(isLoading);
-  }, [isLoading, setIsLoading]);
 
   const data: Record<Board, DataStructure> = {
     SelectBoard: createDataStructure(),
@@ -116,13 +91,17 @@ const Notes = () => {
     setSelectedSubject(value);
   };
 
-  const handleNoteClick = (note: Note) => {
-    console.log("note data send: ", note);
-    navigate(`/notes/${note._id}`, { state: { note } }); // Pass note in state
+  const handleNoteClick = (noteId: string) => {
+    // Navigate to note detail page with ID instead of passing note in state
+    navigate(`/notes/${noteId}`);
   };
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title="Study Notes" 
+        description="Browse educational notes from various subjects and boards"
+      />
       <Header />
       <main className="flex-grow pt-24">
         <div className="container mx-auto px-4">
@@ -189,13 +168,19 @@ const Notes = () => {
           <section className="py-20">
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-center mb-12">Latest Study Notes</h2>
-              {notes.length > 0 ? (
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[...Array(6)].map((_, index) => (
+                    <NoteCardSkeleton key={index} />
+                  ))}
+                </div>
+              ) : notes.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {notes.map((note) => (
                     <Card
                       key={note._id}
                       className="hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => handleNoteClick(note)}
+                      onClick={() => handleNoteClick(note._id)}
                     >
                       <CardHeader>
                         {note.featuredImage && (
