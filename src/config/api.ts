@@ -5,7 +5,7 @@ const API_BASE_URL = 'https://api.myedusync.com';
 export const API_ENDPOINTS = {
   notes: {
     list: `${API_BASE_URL}/getNotesLists`,
-    detail: (id: string) => `${API_BASE_URL}/getNotes/${id}`,
+    detail: (id: string) => `${API_BASE_URL}/getNote/${id}`,
     create: `${API_BASE_URL}/createNotes`,
   },
   tutors: {
