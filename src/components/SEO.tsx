@@ -1,4 +1,3 @@
-
 import { useLocation } from 'react-router-dom';
 import { DEFAULT_SEO, SEOProps } from '@/utils/seo';
 import { Helmet } from 'react-helmet-async';

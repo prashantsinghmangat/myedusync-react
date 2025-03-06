@@ -1,5 +1,3 @@
-
-// Export UI components for easier imports
 export { Button } from "./button";
 export { Input } from "./input";
 export { Label } from "./label";
@@ -15,3 +13,6 @@ export {
   DialogFooter
 } from "./dialog";
 export { Textarea } from "./textarea";
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./card";
+export { Badge } from "./badge";
+export { Popover, PopoverContent, PopoverTrigger } from "./popover";

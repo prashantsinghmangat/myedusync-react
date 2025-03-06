@@ -12,6 +12,7 @@ export interface Course {
   courseThumbnail: string;
   language: string;
   mode: string;
+  location?: string; // Adding this property to fix the TypeScript error
   createdAt: string;
   updatedAt: string;
 }

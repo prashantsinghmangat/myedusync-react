@@ -1,6 +1,6 @@
 
 import { Link, useNavigate } from "react-router-dom";
-import { PenTool, BookOpen, LogOut, LayoutDashboard, User, MessageCircle } from "lucide-react";
+import { PenTool, BookOpen, LogOut, LayoutDashboard, User, MessageCircle, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -61,7 +61,7 @@ export const MobileNavigation = ({
   }
 
   return (
-    <div className="md:hidden block py-4 border-t absolute left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg">
+    <div className="md:hidden block py-4 border-t absolute left-0 right-0 bg-white/95 dark:bg-gray-800 backdrop-blur-md shadow-lg z-50">
       <nav className="flex flex-col space-y-2 px-4">
         <Link to="/" className="text-gray-600 hover:text-accent transition-colors py-2">
           Home
@@ -72,13 +72,17 @@ export const MobileNavigation = ({
         <Link to="/courses" className="text-gray-600 hover:text-accent transition-colors py-2">
           Courses
         </Link>
+        <Link to="/tutor-finder" className="text-gray-600 hover:text-accent transition-colors py-2 flex items-center gap-2">
+          <Search className="h-4 w-4" />
+          Find Tutors
+        </Link>
         <Link to="/blog" className="text-gray-600 hover:text-accent transition-colors py-2">
           Blog
         </Link>
         <Link to="/about" className="text-gray-600 hover:text-accent transition-colors py-2">
           About Us
         </Link>
-        <Link to="/become-tutor" className="text-blue-600 hover:text-blue-700 transition-colors py-2 flex items-center gap-2">
+        <Link to="/become-tutor" className="text-[#f57e2c] hover:text-[#e06a1b] transition-colors py-2 flex items-center gap-2">
           <BookOpen className="h-4 w-4" />
           Become a Tutor
         </Link>
@@ -121,7 +125,7 @@ export const MobileNavigation = ({
               </Button>
             </Link>
             <Link to="/register" className="block">
-              <Button className="w-full bg-accent hover:bg-accent-hover">
+              <Button variant="orange" className="w-full">
                 Register
               </Button>
             </Link>

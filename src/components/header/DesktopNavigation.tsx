@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { PenTool, BookOpen } from "lucide-react";
+import { BookOpen, PenTool, Search } from "lucide-react";
 
 interface DesktopNavigationProps {
   isLoggedIn: boolean;
@@ -20,20 +20,24 @@ export const DesktopNavigation = ({ isLoggedIn, isTeacher }: DesktopNavigationPr
         <Link to="/courses" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
           Courses
         </Link>
+        <Link to="/find-tutor" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium flex items-center gap-1">
+          <Search className="h-4 w-4" />
+          Find Tutors
+        </Link>
         <Link to="/blog" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
           Blog
         </Link>
         <Link to="/about" className="text-gray-600 hover:text-accent transition-colors text-sm font-medium">
           About Us
         </Link>
-        <Link to="/become-tutor" className="text-blue-600 hover:text-blue-700 transition-colors text-sm font-medium flex items-center gap-1">
+        <Link to="/become-tutor" className="text-accent hover:text-accent/80 transition-colors text-sm font-medium flex items-center gap-1">
           <BookOpen className="h-4 w-4" />
           Become a Tutor
         </Link>
         {isLoggedIn && isTeacher && (
           <Link 
             to="/whiteboard" 
-            className="text-accent hover:text-accent-hover transition-colors text-sm font-medium flex items-center gap-1"
+            className="text-accent hover:text-accent/80 transition-colors text-sm font-medium flex items-center gap-1"
           >
             <PenTool className="h-4 w-4" />
             Whiteboard
