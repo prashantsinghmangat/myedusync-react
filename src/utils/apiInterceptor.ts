@@ -41,6 +41,7 @@ export const fetchWithInterceptor = async (url: string, config: RequestConfig = 
 
       throw new Error('Unauthorized');
     }
+    
     if (response.status === 409) {
       const errorData = await response.json().catch(() => null);
       console.log("errorData: ", errorData);  
@@ -50,13 +51,21 @@ export const fetchWithInterceptor = async (url: string, config: RequestConfig = 
       return response;
     }
 
+    // Handle server error responses
+    if (response.status >= 500) {
+      console.error(`Server error: ${response.status} ${response.statusText}`);
+      toast.error("Server error. Please try again later.", {
+        duration: 5000,
+      });
+      return response; // Return the response to let the caller handle it
+    }
 
     // Handle other error responses
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       const errorMessage = errorData?.message || `Error: ${response.status} ${response.statusText}`;
 
-      toast.error(errorData);
+      toast.error(errorData?.message || "An error occurred");
       throw new Error(errorMessage);
     }
 

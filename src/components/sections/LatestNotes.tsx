@@ -11,7 +11,7 @@ import { NoteCardSkeleton } from "@/components/notes/NoteCardSkeleton";
 export const LatestNotes = () => {
   const navigate = useNavigate();
 
-  const { data: notesResponse, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['latestNotes'],
     queryFn: async () => {
       try {
@@ -27,27 +27,31 @@ export const LatestNotes = () => {
           requiresAuth: true,
         });
 
-        const data = await response.json();
-        return data;
+        const responseData = await response.json();
+        
+        // Check if the API returned a success response
+        if (!responseData || !responseData.isSuccess) {
+          console.error("API returned unsuccessful response:", responseData);
+          throw new Error(responseData?.error || "Failed to load notes");
+        }
+        
+        return responseData.data || [];
       } catch (error) {
         console.error("Error fetching notes:", error);
-        // Return a mock response structure when API fails
-        return {
-          isSuccess: false,
-          data: [],
-          error: "Failed to load notes"
-        };
+        throw error; // Let react-query handle the error
       }
     },
     retry: 1,
     retryDelay: 1000,
+    // Return empty array as fallback data if there's an error
+    // This prevents rendering objects directly
+    useErrorBoundary: false, 
   });
 
-  // Extract notes safely from the response
-  const notes = Array.isArray(notesResponse?.data) ? notesResponse.data : [];
+  // Safely handle the notes data
+  const notes = Array.isArray(data) ? data : [];
 
   const handleNoteClick = (noteId: string) => {
-    // Navigate directly using ID instead of passing note data via state
     navigate(`/notes/${noteId}`);
   };
 
@@ -72,17 +76,17 @@ export const LatestNotes = () => {
           </div>
         )}
 
-        {!isLoading && (error || !notesResponse?.isSuccess) && (
+        {!isLoading && error && (
           <div className="text-center py-12">
             <p className="text-gray-500 mb-4">We're having trouble loading the latest notes right now.</p>
             <Button variant="outline" onClick={() => navigate('/notes')}>View All Notes</Button>
           </div>
         )}
         
-        {!isLoading && notesResponse?.isSuccess && (
+        {!isLoading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {notes.length > 0 ? (
-              notes.map((note) => (
+              notes.map((note: Note) => (
                 <Card
                   key={note._id}
                   className="hover:shadow-lg transition-all cursor-pointer border border-gray-200 dark:border-gray-700 dark:bg-gray-800"
@@ -131,7 +135,7 @@ export const LatestNotes = () => {
         )}
 
         {/* Fallback when API fails */}
-        {!isLoading && (error || !notesResponse?.isSuccess) && (
+        {!isLoading && error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
             {[1, 2, 3].map((index) => (
               <Card
@@ -144,7 +148,7 @@ export const LatestNotes = () => {
                     <span className="text-gray-400">Note preview</span>
                   </div>
                   <CardTitle className="text-xl text-gray-900 dark:text-white">
-                    {index === 0 ? "Study Guide" : index === 1 ? "Exam Preparation" : "Key Concepts"}
+                    {index === 1 ? "Study Guide" : index === 2 ? "Exam Preparation" : "Key Concepts"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

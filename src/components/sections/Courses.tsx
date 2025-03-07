@@ -22,7 +22,7 @@ export const Courses = () => {
   const classes = Array.from({ length: 5 }, (_, i) => (i + 8).toString());
   const subjects = ["Mathematics", "Science", "English", "Geography", "History", "Hindi"];
 
-  const { data: coursesResponse, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['homepageCourses', selectedBoard, selectedClass, selectedSubject, searchTerm],
     queryFn: async () => {
       try {
@@ -41,38 +41,32 @@ export const Courses = () => {
         const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;
         console.log("Fetching courses from:", url);
         
-        try {
-          const response = await apiGet(url, {
-            requiresAuth: true
-          });
+        const response = await apiGet(url, {
+          requiresAuth: true
+        });
           
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error("Error fetching courses:", error);
-          // Return a mock response structure when API fails
-          return { 
-            isSuccess: false, 
-            data: [],
-            error: "Failed to load courses" 
-          };
+        const responseData = await response.json();
+        
+        // Validate the API response
+        if (!responseData || !responseData.isSuccess) {
+          console.error("API returned unsuccessful response:", responseData);
+          throw new Error(responseData?.error || "Failed to load courses");
         }
+        
+        return responseData.data || [];
       } catch (error) {
         console.error("Error in query function:", error);
-        return { 
-          isSuccess: false, 
-          data: [],
-          error: "Failed to process course data" 
-        };
+        throw error; // Let react-query handle the error
       }
     },
     retry: 1,
     retryDelay: 1000,
     refetchOnWindowFocus: false,
+    useErrorBoundary: false, // Don't use error boundary
   });
 
-  // Extract courses safely from the response, handling both API success and error cases
-  const courses = Array.isArray(coursesResponse?.data) ? coursesResponse.data : [];
+  // Extract courses safely - ensure it's an array
+  const courses = Array.isArray(data) ? data : [];
 
   const applyFilters = () => {
     refetch();
@@ -167,7 +161,7 @@ export const Courses = () => {
           </div>
         </div>
 
-        {/* Loading & Error States */}
+        {/* Loading State */}
         {isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((item) => (
@@ -190,7 +184,8 @@ export const Courses = () => {
           </div>
         )}
         
-        {!isLoading && (error || !coursesResponse?.isSuccess) && (
+        {/* Error State */}
+        {!isLoading && error && (
           <div className="text-center bg-red-50 p-8 rounded-lg border border-red-100">
             <p className="text-red-500 font-medium mb-4">We encountered an error loading courses</p>
             <p className="text-gray-600 mb-4">Don't worry! You can still browse all our courses.</p>
@@ -199,9 +194,9 @@ export const Courses = () => {
         )}
 
         {/* Course Grid - Only show when not loading and no error */}
-        {!isLoading && !error && coursesResponse?.isSuccess && (
+        {!isLoading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {courses && courses.length > 0 ? (
+            {courses.length > 0 ? (
               courses.map((course) => (
                 <div 
                   key={course._id} 
@@ -246,8 +241,8 @@ export const Courses = () => {
           </div>
         )}
         
-        {/* Fallback Grid - Show when API fails or returns errors */}
-        {!isLoading && (error || !coursesResponse?.isSuccess) && (
+        {/* Fallback Grid - Always show when API fails */}
+        {!isLoading && error && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
             {[1, 2, 3].map((index) => (
               <div 
@@ -266,7 +261,7 @@ export const Courses = () => {
                     </span>
                   </div>
                   <h3 className="text-xl font-bold mb-2">
-                    {index === 0 ? "Mathematics" : index === 1 ? "Science" : "English"}
+                    {index === 1 ? "Mathematics" : index === 2 ? "Science" : "English"}
                   </h3>
                   <p className="text-sm text-gray-600">
                     Explore our popular courses with expert tutors.
