@@ -12,9 +12,9 @@ import { toast } from 'sonner';
 
 export const Courses = () => {
   const navigate = useNavigate();
-  const [selectedBoard, setSelectedBoard] = useState<string>("");
-  const [selectedClass, setSelectedClass] = useState<string>("");
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [selectedBoard, setSelectedBoard] = useState<string>("all-boards");
+  const [selectedClass, setSelectedClass] = useState<string>("all-classes");
+  const [selectedSubject, setSelectedSubject] = useState<string>("all-subjects");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   // Common filter options
@@ -40,31 +40,48 @@ export const Courses = () => {
         // Make API call
         const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;
         console.log("Fetching courses from:", url);
-        const response = await apiGet(url, {
-          requiresAuth: true
-        });
-
-        const data = await response.json();
-        return data;
+        
+        try {
+          const response = await apiGet(url, {
+            requiresAuth: true
+          });
+          
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Error fetching courses:", error);
+          // Return a mock response structure when API fails
+          return { 
+            isSuccess: false, 
+            data: [],
+            error: "Failed to load courses" 
+          };
+        }
       } catch (error) {
-        console.error("Error fetching courses:", error);
-        return { isSuccess: false, data: [] }; // Return empty array on error
+        console.error("Error in query function:", error);
+        return { 
+          isSuccess: false, 
+          data: [],
+          error: "Failed to process course data" 
+        };
       }
     },
+    retry: 1,
+    retryDelay: 1000,
     refetchOnWindowFocus: false,
   });
 
-  // Extract courses safely from the response
-  const courses = coursesResponse?.isSuccess ? coursesResponse.data : [];
+  // Extract courses safely from the response, handling both API success and error cases
+  const courses = Array.isArray(coursesResponse?.data) ? coursesResponse.data : [];
 
   const applyFilters = () => {
     refetch();
   };
 
   const clearFilters = () => {
-    setSelectedBoard("");
-    setSelectedClass("");
-    setSelectedSubject("");
+    setSelectedBoard("all-boards");
+    setSelectedClass("all-classes");
+    setSelectedSubject("all-subjects");
     setSearchTerm("");
     refetch();
   };
@@ -173,7 +190,7 @@ export const Courses = () => {
           </div>
         )}
         
-        {error && (
+        {!isLoading && (error || !coursesResponse?.isSuccess) && (
           <div className="text-center bg-red-50 p-8 rounded-lg border border-red-100">
             <p className="text-red-500 font-medium mb-4">We encountered an error loading courses</p>
             <p className="text-gray-600 mb-4">Don't worry! You can still browse all our courses.</p>
@@ -182,7 +199,7 @@ export const Courses = () => {
         )}
 
         {/* Course Grid - Only show when not loading and no error */}
-        {!isLoading && !error && (
+        {!isLoading && !error && coursesResponse?.isSuccess && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {courses && courses.length > 0 ? (
               courses.map((course) => (
@@ -226,6 +243,45 @@ export const Courses = () => {
                 <Button variant="outline" onClick={clearFilters}>Clear Filters</Button>
               </div>
             )}
+          </div>
+        )}
+        
+        {/* Fallback Grid - Show when API fails or returns errors */}
+        {!isLoading && (error || !coursesResponse?.isSuccess) && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+            {[1, 2, 3].map((index) => (
+              <div 
+                key={index} 
+                className="bg-white rounded-xl overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                onClick={() => navigate('/courses')}
+              >
+                <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                  <span className="text-gray-400">Course image</span>
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <CircleCheck className="w-4 h-4 text-yellow-500" />
+                    <span className="text-sm text-gray-500">
+                      Featured Course
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">
+                    {index === 0 ? "Mathematics" : index === 1 ? "Science" : "English"}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Explore our popular courses with expert tutors.
+                  </p>
+                  <div className="flex items-center justify-between mt-4">
+                    <span className="text-sm text-gray-600">
+                      Multiple sessions available
+                    </span>
+                    <span className="text-orange-500 font-bold">
+                      View details
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
         
