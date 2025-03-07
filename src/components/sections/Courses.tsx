@@ -33,6 +33,10 @@ export const Courses = () => {
       
       // Add limit for homepage
       params.append('limit', '6');
+      params.append('page', '0');
+      params.append('board', 'IGCSE');
+      params.append('class', '10');
+      params.append('subject', 'Science');
       
       // Make API call
       const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;

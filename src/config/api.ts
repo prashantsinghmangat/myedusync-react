@@ -25,8 +25,8 @@ export const API_ENDPOINTS = {
     addTutorBasicDetails: `${API_BASE_URL}/addTutorBasicDetails`,
   },
   courses: {
-    list: `${API_BASE_URL}/getCourses`,
-    detail: (id: string) => `${API_BASE_URL}/getCourse/${id}`,
+    list: `${API_BASE_URL}/courses`,
+    detail: (id: string) => `${API_BASE_URL}/courses/${id}`,
     create: `${API_BASE_URL}/createCourse`,
     tutorCourses: `${API_BASE_URL}/allTutorsCoursesList`,
     updateCourse: `${API_BASE_URL}/updateCourse`,
