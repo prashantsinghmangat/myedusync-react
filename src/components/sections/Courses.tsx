@@ -24,28 +24,30 @@ export const Courses = () => {
   const { data: courses = [], isLoading, error, refetch } = useQuery({
     queryKey: ['homepageCourses', selectedBoard, selectedClass, selectedSubject, searchTerm],
     queryFn: async () => {
-      // Build query parameters
-      const params = new URLSearchParams();
-      if (selectedBoard) params.append('board', selectedBoard);
-      if (selectedClass) params.append('class', selectedClass);
-      if (selectedSubject) params.append('subject', selectedSubject);
-      if (searchTerm) params.append('search', searchTerm);
-      
-      // Add limit for homepage
-      params.append('limit', '6');
-      params.append('page', '0');
-      params.append('board', 'IGCSE');
-      params.append('class', '10');
-      params.append('subject', 'Science');
-      
-      // Make API call
-      const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;
-      const response = await apiGet(url, {
-        requiresAuth: true
-      });
+      try {
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (selectedBoard) params.append('board', selectedBoard);
+        if (selectedClass) params.append('class', selectedClass);
+        if (selectedSubject) params.append('subject', selectedSubject);
+        if (searchTerm) params.append('search', searchTerm);
+        
+        // Add limit for homepage
+        params.append('limit', '6');
+        params.append('page', '0');
+        
+        // Make API call
+        const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;
+        const response = await apiGet(url, {
+          requiresAuth: true
+        });
 
-      const data = await response.json();
-      return data?.data || [];
+        const data = await response.json();
+        return data?.data || [];
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        return []; // Return empty array on error
+      }
     },
   });
 
@@ -105,7 +107,7 @@ export const Courses = () => {
                 <SelectValue placeholder="All Boards" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Boards</SelectItem>
+                <SelectItem value="all-boards">All Boards</SelectItem>
                 {boards.map(board => (
                   <SelectItem key={board} value={board.toLowerCase()}>{board}</SelectItem>
                 ))}
@@ -117,7 +119,7 @@ export const Courses = () => {
                 <SelectValue placeholder="All Classes" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Classes</SelectItem>
+                <SelectItem value="all-classes">All Classes</SelectItem>
                 {classes.map(cls => (
                   <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
                 ))}
@@ -144,7 +146,7 @@ export const Courses = () => {
 
         {/* Loading & Error States */}
         {isLoading && <p className="text-center text-gray-500">Loading courses...</p>}
-        {error && <p className="text-center text-red-500">{error.message}</p>}
+        {error && <p className="text-center text-red-500">Something went wrong. Please try again.</p>}
 
         {/* Course Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -169,9 +171,9 @@ export const Courses = () => {
                   </div>
                   <h3 className="text-xl font-bold mb-2">{course.subject}</h3>
                   <p className="text-sm text-gray-600 truncate">
-                    {course.aboutThisCourse.length > 100
+                    {course.aboutThisCourse?.length > 100
                       ? `${course.aboutThisCourse.slice(0, 100)}...`
-                      : course.aboutThisCourse}
+                      : course.aboutThisCourse || 'No description available'}
                   </p>
                   <div className="flex items-center justify-between mt-4">
                     <span className="text-sm text-gray-600">

@@ -62,31 +62,36 @@ const Courses = () => {
   const { data: courses = [], isLoading, refetch } = useQuery({
     queryKey: ['courses', selectedBoard, selectedClass, selectedSubject, searchTerm, currentPage],
     queryFn: async () => {
-      // Build query parameters
-      const params = new URLSearchParams();
-      if (selectedBoard) params.append('board', selectedBoard);
-      if (selectedClass) params.append('class', selectedClass);
-      if (selectedSubject) params.append('subject', selectedSubject);
-      if (searchTerm) params.append('search', searchTerm);
-      
-      // Add pagination params
-      params.append('page', currentPage.toString());
-      params.append('limit', ITEMS_PER_PAGE.toString());
-      
-      // Make API call
-      const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;
-      const response = await apiGet(url, {
-        requiresAuth: true
-      });
+      try {
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (selectedBoard) params.append('board', selectedBoard);
+        if (selectedClass) params.append('class', selectedClass);
+        if (selectedSubject) params.append('subject', selectedSubject);
+        if (searchTerm) params.append('search', searchTerm);
+        
+        // Add pagination params
+        params.append('page', currentPage.toString());
+        params.append('limit', ITEMS_PER_PAGE.toString());
+        
+        // Make API call
+        const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;
+        const response = await apiGet(url, {
+          requiresAuth: true
+        });
 
-      const data = await response.json();
-      
-      // Update total pages if totalCount is available
-      if (data?.totalCount) {
-        setTotalPages(Math.ceil(data.totalCount / ITEMS_PER_PAGE));
+        const data = await response.json();
+        
+        // Update total pages if totalCount is available
+        if (data?.totalCount) {
+          setTotalPages(Math.ceil(data.totalCount / ITEMS_PER_PAGE));
+        }
+        
+        return data?.data || [];
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        return []; // Return empty array on error
       }
-      
-      return data?.data || [];
     },
   });
 
@@ -159,7 +164,7 @@ const Courses = () => {
                     <SelectValue placeholder="Select Board" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Boards</SelectItem>
+                    <SelectItem value="all-boards">All Boards</SelectItem>
                     {boards.map((board) => (
                       <SelectItem key={board} value={board.toLowerCase()}>
                         {board}
@@ -176,7 +181,7 @@ const Courses = () => {
                     <SelectValue placeholder="Select Class" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Classes</SelectItem>
+                    <SelectItem value="all-classes">All Classes</SelectItem>
                     {classes.map((classNum) => (
                       <SelectItem key={classNum} value={classNum}>
                         Class {classNum}
@@ -193,7 +198,7 @@ const Courses = () => {
                     <SelectValue placeholder="Select Subject" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Subjects</SelectItem>
+                    <SelectItem value="all-subjects">All Subjects</SelectItem>
                     {subjects.map((subject) => (
                       <SelectItem key={subject} value={subject.toLowerCase()}>
                         {subject}

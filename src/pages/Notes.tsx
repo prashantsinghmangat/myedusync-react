@@ -42,30 +42,28 @@ const Notes = () => {
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ['notes', selectedBoard, selectedClass, selectedSubject, currentPage],
     queryFn: async () => {
-      const queryParams = new URLSearchParams();
-      queryParams.append('page', currentPage.toString());
-      queryParams.append('limit', itemsPerPage.toString());
-      
-      if (selectedBoard && selectedBoard !== "SelectBoard") {
-        queryParams.append('board', selectedBoard);
-      }
-      
-      if (selectedClass) {
-        queryParams.append('class', selectedClass.toString());
-      }
-      
-      if (selectedSubject) {
-        queryParams.append('subject', selectedSubject);
-      }
-      
-      const url = `${API_ENDPOINTS.notes.list}?${queryParams.toString()}`;
-      console.log("Fetching notes from:", url); // Debugging API URL
-
       try {
+        const queryParams = new URLSearchParams();
+        queryParams.append('page', currentPage.toString());
+        queryParams.append('limit', itemsPerPage.toString());
+        
+        if (selectedBoard && selectedBoard !== "SelectBoard") {
+          queryParams.append('board', selectedBoard);
+        }
+        
+        if (selectedClass) {
+          queryParams.append('class', selectedClass.toString());
+        }
+        
+        if (selectedSubject) {
+          queryParams.append('subject', selectedSubject);
+        }
+        
+        const url = `${API_ENDPOINTS.notes.list}?${queryParams.toString()}`;
+        console.log("Fetching notes from:", url); // Debugging API URL
+
         const response = await apiGet(url, { requiresAuth: true });
         const responseData = await response.json();
-
-        console.log("API Response:", responseData); // Debugging response
         
         // Calculate total pages
         if (responseData.pagination) {
@@ -280,12 +278,14 @@ const Notes = () => {
               <Label htmlFor="class-select">Class</Label>
               <Select
                 onValueChange={handleClassChange}
-                value={selectedClass?.toString() || ""}
+                value={selectedClass?.toString() || "no-class"}
+                disabled={!selectedBoard || selectedBoard === "SelectBoard"}
               >
                 <SelectTrigger className="w-full" id="class-select">
                   <SelectValue placeholder="Select Class" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="no-class">All Classes</SelectItem>
                   {data[selectedBoard].classes.map((classNum) => (
                     <SelectItem key={classNum} value={classNum.toString()}>
                       Class {classNum}
@@ -299,12 +299,14 @@ const Notes = () => {
               <Label htmlFor="subject-select">Subject</Label>
               <Select
                 onValueChange={handleSubjectChange}
-                value={selectedSubject || ""}
+                value={selectedSubject || "no-subject"}
+                disabled={!selectedClass}
               >
                 <SelectTrigger className="w-full" id="subject-select">
                   <SelectValue placeholder="Select Subject" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="no-subject">All Subjects</SelectItem>
                   {selectedClass && data[selectedBoard].subjects[selectedClass].map((subject) => (
                     <SelectItem key={subject} value={subject}>
                       {subject}
