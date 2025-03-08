@@ -51,13 +51,16 @@ export const fetchWithInterceptor = async (url: string, config: RequestConfig = 
       return response;
     }
 
-    // Handle server error responses
+    // Handle server error responses (500, 502, 503, etc.)
     if (response.status >= 500) {
       console.error(`Server error: ${response.status} ${response.statusText}`);
-      toast.error("Server error. Please try again later.", {
+      toast.error("Server error. Please try again later or contact support if the issue persists.", {
         duration: 5000,
       });
-      return response; // Return the response to let the caller handle it
+      
+      // For server errors, we'll return the response object to let the caller handle it
+      // This will allow fallback UIs to be shown without crashing the app
+      return response;
     }
 
     // Handle other error responses

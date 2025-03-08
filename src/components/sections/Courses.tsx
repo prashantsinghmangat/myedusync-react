@@ -62,7 +62,7 @@ export const Courses = () => {
     retry: 1,
     retryDelay: 1000,
     refetchOnWindowFocus: false,
-    useErrorBoundary: false, // Don't use error boundary
+    // Removed useErrorBoundary property as it's not supported in this version
   });
 
   // Extract courses safely - ensure it's an array

@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -43,9 +42,6 @@ export const LatestNotes = () => {
     },
     retry: 1,
     retryDelay: 1000,
-    // Return empty array as fallback data if there's an error
-    // This prevents rendering objects directly
-    useErrorBoundary: false, 
   });
 
   // Safely handle the notes data
@@ -134,7 +130,6 @@ export const LatestNotes = () => {
           </div>
         )}
 
-        {/* Fallback when API fails */}
         {!isLoading && error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
             {[1, 2, 3].map((index) => (
