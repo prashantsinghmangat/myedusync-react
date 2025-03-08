@@ -1,86 +1,294 @@
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { CircleCheck } from 'lucide-react';
+import { CircleCheck, Search, X } from 'lucide-react';
 import { apiGet } from '@/utils/apiInterceptor';
+import { API_ENDPOINTS } from '@/config/api';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export const Courses = () => {
-  const baseUrl = 'https://api.myedusync.com/courses';
+  const navigate = useNavigate();
+  const [selectedBoard, setSelectedBoard] = useState<string>("all-boards");
+  const [selectedClass, setSelectedClass] = useState<string>("all-classes");
+  const [selectedSubject, setSelectedSubject] = useState<string>("all-subjects");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const { data: courses = [], isLoading, error } = useQuery({
-    queryKey: ['courses'],
+  // Common filter options
+  const boards = ["CBSE", "ICSE", "IGCSE", "Edexcel"];
+  const classes = Array.from({ length: 5 }, (_, i) => (i + 8).toString());
+  const subjects = ["Mathematics", "Science", "English", "Geography", "History", "Hindi"];
+
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['homepageCourses', selectedBoard, selectedClass, selectedSubject, searchTerm],
     queryFn: async () => {
-      const response = await apiGet(baseUrl, {
-        requiresAuth: true,
-      });
-
-      const data = await response.json();
-      return data?.data || [];
+      try {
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (selectedBoard && selectedBoard !== "all-boards") params.append('board', selectedBoard);
+        if (selectedClass && selectedClass !== "all-classes") params.append('class', selectedClass);
+        if (selectedSubject && selectedSubject !== "all-subjects") params.append('subject', selectedSubject);
+        if (searchTerm) params.append('search', searchTerm);
+        
+        // Add limit for homepage
+        params.append('limit', '6');
+        params.append('page', '0');
+        
+        // Make API call
+        const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;
+        console.log("Fetching courses from:", url);
+        
+        const response = await apiGet(url, {
+          requiresAuth: true
+        });
+          
+        const responseData = await response.json();
+        
+        // Validate the API response
+        if (!responseData || !responseData.isSuccess) {
+          console.error("API returned unsuccessful response:", responseData);
+          throw new Error(responseData?.error || "Failed to load courses");
+        }
+        
+        return responseData.data || [];
+      } catch (error) {
+        console.error("Error in query function:", error);
+        throw error; // Let react-query handle the error
+      }
     },
+    retry: 1,
+    retryDelay: 1000,
+    refetchOnWindowFocus: false,
+    // Removed useErrorBoundary property as it's not supported in this version
   });
+
+  // Extract courses safely - ensure it's an array
+  const courses = Array.isArray(data) ? data : [];
+
+  const applyFilters = () => {
+    refetch();
+  };
+
+  const clearFilters = () => {
+    setSelectedBoard("all-boards");
+    setSelectedClass("all-classes");
+    setSelectedSubject("all-subjects");
+    setSearchTerm("");
+    refetch();
+  };
+
+  const viewAllCourses = () => {
+    // Navigate to courses page with current filters
+    const params = new URLSearchParams();
+    if (selectedBoard && selectedBoard !== "all-boards") params.append('board', selectedBoard);
+    if (selectedClass && selectedClass !== "all-classes") params.append('class', selectedClass);
+    if (selectedSubject && selectedSubject !== "all-subjects") params.append('subject', selectedSubject);
+    if (searchTerm) params.append('search', searchTerm);
+    
+    navigate(`/courses?${params.toString()}`);
+  };
 
   return (
     <div className="w-full bg-[#FFF5F5] py-16">
       <div className="max-w-[1400px] mx-auto px-6">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <div className="inline-block px-4 py-2 bg-orange-100 rounded-full mb-4">
               <span className="text-orange-500">Our Courses</span>
             </div>
             <h2 className="text-3xl font-bold">Explore Our Courses</h2>
           </div>
-          <div className="flex items-center space-x-4">
-            <input
-              type="text"
-              placeholder="Search Courses"
-              className="px-4 py-2 border rounded-lg"
-            />
-            <select className="px-4 py-2 border rounded-lg">
-              <option>All Categories</option>
-            </select>
+          <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4 md:mt-0 w-full md:w-auto">
+            <div className="relative w-full md:w-auto">
+              <Input
+                placeholder="Search Courses"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="min-w-[200px]"
+              />
+              {searchTerm && (
+                <button 
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={() => setSearchTerm('')}
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+            
+            <Select value={selectedBoard} onValueChange={setSelectedBoard}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="All Boards" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-boards">All Boards</SelectItem>
+                {boards.map(board => (
+                  <SelectItem key={board} value={board.toLowerCase()}>{board}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select value={selectedClass} onValueChange={setSelectedClass}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="All Classes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-classes">All Classes</SelectItem>
+                {classes.map(cls => (
+                  <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <div className="flex space-x-2 w-full md:w-auto">
+              <Button 
+                variant="outline" 
+                onClick={clearFilters}
+                className="w-1/2 md:w-auto"
+              >
+                Clear
+              </Button>
+              <Button 
+                onClick={applyFilters}
+                className="w-1/2 md:w-auto"
+              >
+                Filter
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Loading & Error States */}
-        {isLoading && <p className="text-center text-gray-500">Loading courses...</p>}
-        {error && <p className="text-center text-red-500">{error.message}</p>}
+        {/* Loading State */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div key={item} className="bg-white rounded-xl overflow-hidden shadow-lg animate-pulse">
+                <div className="w-full h-48 bg-gray-200"></div>
+                <div className="p-6">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="w-4 h-4 bg-gray-200 rounded-full"></div>
+                    <div className="h-4 w-1/3 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="h-6 bg-gray-200 rounded mb-2 w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-4 w-full"></div>
+                  <div className="flex items-center justify-between mt-4">
+                    <div className="h-4 w-1/4 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-1/4 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Error State */}
+        {!isLoading && error && (
+          <div className="text-center bg-red-50 p-8 rounded-lg border border-red-100">
+            <p className="text-red-500 font-medium mb-4">We encountered an error loading courses</p>
+            <p className="text-gray-600 mb-4">Don't worry! You can still browse all our courses.</p>
+            <Button onClick={viewAllCourses}>View All Courses</Button>
+          </div>
+        )}
 
-        {/* Course Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {courses.length > 0 ? (
-            courses.map((course) => (
-              <div key={course._id} className="bg-white rounded-xl overflow-hidden shadow-lg">
-                <img
-                  src={course.courseThumbnail}
-                  alt={course.subject}
-                  className="w-full h-48 object-cover"
-                />
+        {/* Course Grid - Only show when not loading and no error */}
+        {!isLoading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {courses.length > 0 ? (
+              courses.map((course) => (
+                <div 
+                  key={course._id} 
+                  className="bg-white rounded-xl overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                  onClick={() => navigate(`/courses/${course._id}`)}
+                >
+                  <img
+                    src={course.courseThumbnail || 'https://via.placeholder.com/400x200?text=Course+Image'}
+                    alt={course.subject}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <CircleCheck className="w-4 h-4 text-yellow-500" />
+                      <span className="text-sm text-gray-500">
+                        {course.board} - Class {course.className}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{course.subject}</h3>
+                    <p className="text-sm text-gray-600 truncate">
+                      {course.aboutThisCourse?.length > 100
+                        ? `${course.aboutThisCourse.slice(0, 100)}...`
+                        : course.aboutThisCourse || 'No description available'}
+                    </p>
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-sm text-gray-600">
+                        {course.weeklySessions} sessions/week
+                      </span>
+                      <span className="text-orange-500 font-bold">
+                        {course.costPerSessions} {course.currency}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-gray-500 mb-4">No courses available or matching your criteria.</p>
+                <Button variant="outline" onClick={clearFilters}>Clear Filters</Button>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Fallback Grid - Always show when API fails */}
+        {!isLoading && error && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+            {[1, 2, 3].map((index) => (
+              <div 
+                key={index} 
+                className="bg-white rounded-xl overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                onClick={() => navigate('/courses')}
+              >
+                <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                  <span className="text-gray-400">Course image</span>
+                </div>
                 <div className="p-6">
                   <div className="flex items-center space-x-2 mb-4">
                     <CircleCheck className="w-4 h-4 text-yellow-500" />
                     <span className="text-sm text-gray-500">
-                      {course.board} - Class {course.className}
+                      Featured Course
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{course.subject}</h3>
-                  <p className="text-sm text-gray-600 truncate">
-                    {course.aboutThisCourse.length > 100
-                      ? `${course.aboutThisCourse.slice(0, 100)}...`
-                      : course.aboutThisCourse}
+                  <h3 className="text-xl font-bold mb-2">
+                    {index === 1 ? "Mathematics" : index === 2 ? "Science" : "English"}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Explore our popular courses with expert tutors.
                   </p>
                   <div className="flex items-center justify-between mt-4">
                     <span className="text-sm text-gray-600">
-                      {course.weeklySessions} sessions/week
+                      Multiple sessions available
                     </span>
                     <span className="text-orange-500 font-bold">
-                      ${course.costPerSessions} {course.currency}
+                      View details
                     </span>
                   </div>
                 </div>
               </div>
-            ))
-          ) : (
-            !isLoading && <p className="text-center text-gray-500">No courses available.</p>
-          )}
+            ))}
+          </div>
+        )}
+        
+        {/* View All Button */}
+        <div className="flex justify-center mt-10">
+          <Button 
+            onClick={viewAllCourses} 
+            variant="outline" 
+            className="px-8 py-2"
+          >
+            View All Courses
+          </Button>
         </div>
       </div>
     </div>

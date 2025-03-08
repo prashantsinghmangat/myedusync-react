@@ -21,6 +21,7 @@ import BecomeTutor from './pages/BecomeTutor';
 import FindTutorSteps from './pages/FindTutorSteps';
 import FindTutor from './pages/FindTutor';
 import TutorDetail from './pages/TutorDetail';
+import TutorDetailNew from "@/pages/TutorDetailNew";
 import Contact from './pages/Contact';
 import StudentDashboard from './pages/student/Dashboard';
 import StudentProfile from './pages/student/Profile';
@@ -49,6 +50,7 @@ const App = () => {
             <Route path="/find-tutor-steps" element={<FindTutorSteps />} />
             <Route path="/find-tutor" element={<FindTutor />} />
             <Route path="/tutor/:id" element={<TutorDetail />} />
+            <Route path="/tutor-new/:id?" element={<TutorDetailNew />} />
             <Route path="/contact" element={<Contact />} />
             
             {/* Student Routes */}

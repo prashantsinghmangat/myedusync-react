@@ -13,6 +13,7 @@ import { API_ENDPOINTS } from "@/config/api";
 import { apiGet } from "@/utils/apiInterceptor";
 import { NoteDetailSkeleton } from "@/components/notes/NoteDetailSkeleton";
 import { RecentNotesSkeleton } from "@/components/notes/RecentNotesSkeleton";
+import { generateStructuredData } from "@/utils/seo";
 
 const NoteDetail = () => {
   const { id } = useParams();
@@ -36,19 +37,74 @@ const NoteDetail = () => {
       .then((data) => {
         if (data.isSuccess && data.data) {
           setNote(data.data);
+          
+          // After we get the note, fetch related notes
+          fetchRelatedNotes(data.data);
         } else {
           console.error("Error fetching note details:", data);
+          // Fetch some default recent notes if the main note fetch fails
+          fetchRecentNotes();
         }
         setNoteLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching note details:", error);
         setNoteLoading(false);
+        // Fetch some default recent notes if the main note fetch fails
+        fetchRecentNotes();
       });
   }, [id]);
 
-  // Fetch recent notes
-  useEffect(() => {
+  // Fetch related notes based on current note's attributes
+  const fetchRelatedNotes = (currentNote: Note) => {
+    setRecentNotesLoading(true);
+    
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', '0');
+    queryParams.append('limit', '5');
+    
+    // Add filters based on the current note's attributes
+    if (currentNote.notesBoard) {
+      queryParams.append('board', currentNote.notesBoard);
+    }
+    
+    if (currentNote.notesClass) {
+      queryParams.append('class', currentNote.notesClass);
+    }
+    
+    if (currentNote.notesSubject) {
+      queryParams.append('subject', currentNote.notesSubject);
+    }
+    
+    const url = `${API_ENDPOINTS.notes.list}?${queryParams.toString()}`;
+    console.log("Fetching related notes from:", url);
+    
+    apiGet(url, { requiresAuth: true })
+      .then((res) => res.json())
+      .then((data) => {
+        // Filter out the current note from related notes
+        const filteredNotes = (data.data || []).filter(
+          (relatedNote: Note) => relatedNote._id !== currentNote._id
+        );
+        
+        if (filteredNotes.length > 0) {
+          setRecentNotes(filteredNotes);
+        } else {
+          // If no related notes, fetch general recent notes
+          fetchRecentNotes();
+        }
+        setRecentNotesLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching related notes:", error);
+        setRecentNotesLoading(false);
+        // Fallback to general recent notes
+        fetchRecentNotes();
+      });
+  };
+
+  // Fetch general recent notes when no specific filters are available
+  const fetchRecentNotes = () => {
     setRecentNotesLoading(true);
     
     apiGet(`${API_ENDPOINTS.notes.list}?page=0&limit=5`, {
@@ -63,12 +119,43 @@ const NoteDetail = () => {
         console.error("Error fetching recent notes:", error);
         setRecentNotesLoading(false);
       });
-  }, []);
+  };
 
   // Combined loading state for any initial render logic
   useEffect(() => {
     setLoading(noteLoading || recentNotesLoading);
   }, [noteLoading, recentNotesLoading]);
+
+  // Generate structured data for SEO
+  const generateNoteStructuredData = () => {
+    if (!note) return null;
+    
+    return generateStructuredData('Article', {
+      headline: note.title,
+      description: `${note.notesSubject} notes for ${note.notesClass} students from ${note.notesBoard} board`,
+      author: {
+        "@type": "Person",
+        "name": note.author
+      },
+      publisher: {
+        "@type": "Organization",
+        "name": "MyEduSync",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://myedusync.com/og-image.png"
+        }
+      },
+      image: note.featuredImage || "https://myedusync.com/og-image.png",
+      datePublished: note.createdAt,
+      dateModified: note.updatedAt,
+      about: {
+        "@type": "Thing",
+        "name": note.notesSubject
+      },
+      educationalLevel: note.notesClass,
+      keywords: note.tags?.join(", ")
+    });
+  };
 
   if (!id) {
     return (
@@ -86,7 +173,8 @@ const NoteDetail = () => {
     <div className="min-h-screen flex flex-col">
       <SEO 
         title={note?.title || "Note Details"} 
-        description={`Educational notes on ${note?.notesSubject || "various subjects"}`}
+        description={note ? `${note.notesSubject} notes for ${note.notesClass} students from ${note.notesBoard} board` : "Educational notes on various subjects"}
+        structuredData={generateNoteStructuredData()}
       />
       <Header />
       <main className="flex-grow pt-20"> {/* Added pt-20 to prevent hiding under header */}
@@ -192,7 +280,9 @@ const NoteDetail = () => {
           <aside className="lg:w-1/3 w-full mt-8 lg:mt-0">
             {/* Recent Notes Section */}
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-4">Recent Notes</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                {note ? `Related ${note.notesSubject} Notes` : "Recent Notes"}
+              </h3>
               {recentNotesLoading ? (
                 <RecentNotesSkeleton count={5} />
               ) : recentNotes.length > 0 ? (
@@ -213,14 +303,16 @@ const NoteDetail = () => {
                         )}
                         <div>
                           <p className="font-medium">{recentNote.title}</p>
-                          <p className="text-gray-500 text-sm">{recentNote.notesSubject}</p>
+                          <p className="text-gray-500 text-sm">
+                            {recentNote.notesSubject} | Class {recentNote.notesClass}
+                          </p>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500">No recent notes available.</p>
+                <p className="text-gray-500">No related notes available.</p>
               )}
             </div>
 
@@ -228,8 +320,24 @@ const NoteDetail = () => {
             <div className="p-4 bg-gray-100 rounded-lg">
               <h3 className="text-lg font-semibold mb-3">Categories</h3>
               <div className="space-y-2">
-                <p className="text-gray-700">📘 Class 10 Notes</p>
-                <p className="text-gray-700">📗 Class 12 Notes</p>
+                {note?.notesBoard && (
+                  <p className="text-gray-700 cursor-pointer hover:text-primary"
+                     onClick={() => navigate(`/notes?board=${note.notesBoard}`)}>
+                    📘 {note.notesBoard} Board Notes
+                  </p>
+                )}
+                {note?.notesClass && (
+                  <p className="text-gray-700 cursor-pointer hover:text-primary"
+                     onClick={() => navigate(`/notes?class=${note.notesClass}`)}>
+                    📗 Class {note.notesClass} Notes
+                  </p>
+                )}
+                {note?.notesSubject && (
+                  <p className="text-gray-700 cursor-pointer hover:text-primary"
+                     onClick={() => navigate(`/notes?subject=${note.notesSubject}`)}>
+                    📙 {note.notesSubject} Notes
+                  </p>
+                )}
               </div>
             </div>
           </aside>
