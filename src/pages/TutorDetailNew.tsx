@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from "@/components/Header";
@@ -110,14 +109,32 @@ const TutorDetailNew = () => {
     queryKey: ['tutorProfile', tutorId],
     queryFn: async () => {
       try {
-        const response = await apiGet(`${API_ENDPOINTS.tutors.getTutorProfile}/${tutorId}`);
+        console.log(`Fetching tutor profile: ${API_ENDPOINTS.tutors.getTutorProfile}/${tutorId}`);
+        const response = await apiGet(`${API_ENDPOINTS.tutors.getTutorProfile}/${tutorId}`, {
+          skipAuthRedirect: true, // Skip auth redirect for public tutor profiles
+        });
+        
+        // Check if response is ok
+        if (!response.ok) {
+          console.error(`Error fetching tutor data: ${response.status}`);
+          // Handle specific status codes
+          if (response.status === 404) {
+            return { isSuccess: false, data: null, message: "Tutor not found" };
+          }
+          
+          return { isSuccess: false, data: null, message: "Failed to load tutor" };
+        }
+        
         const data = await response.json();
+        console.log("Tutor data received:", data);
         return data;
       } catch (error) {
         console.error("Error fetching tutor data:", error);
-        throw error;
+        return { isSuccess: false, data: null, message: "Failed to load tutor profile" };
       }
     },
+    retry: 1,
+    retryDelay: 1000,
     refetchOnWindowFocus: false,
   });
 
@@ -142,7 +159,10 @@ const TutorDetailNew = () => {
   const classesArray = tutorProfile?.classes ? tutorProfile.classes.split(',').map(c => c.trim()) : [];
   const subjectsArray = tutorProfile?.subjects ? tutorProfile.subjects.split(',').map(s => s.trim()) : [];
 
-  if (error) {
+  // Check if there was an error or if the tutor was not found
+  const showErrorUI = error || (tutorResponse && !tutorResponse.isSuccess);
+
+  if (showErrorUI) {
     return (
       <>
         <SEO
@@ -155,9 +175,9 @@ const TutorDetailNew = () => {
             <AlertTriangle className="mx-auto h-16 w-16 text-yellow-500 mb-4" />
             <h1 className="text-3xl font-bold mb-4">Tutor Profile Unavailable</h1>
             <p className="text-gray-600 dark:text-gray-400 mb-8">
-              We couldn't load this tutor's profile. It may have been removed or there's a temporary issue.
+              {tutorResponse?.message || "We couldn't load this tutor's profile. It may have been removed or there's a temporary issue."}
             </p>
-            <Button onClick={() => navigate('/tutor-finder')} variant="default">
+            <Button onClick={() => navigate('/find-tutor')} variant="default">
               Browse Available Tutors
             </Button>
           </div>
@@ -634,7 +654,7 @@ const TutorDetailNew = () => {
                 We couldn't find the tutor you're looking for. They may have removed their profile.
               </p>
               <Button variant="orange" asChild>
-                <Link to="/tutor-finder">Browse All Tutors</Link>
+                <Link to="/find-tutor">Browse All Tutors</Link>
               </Button>
             </div>
           )}
