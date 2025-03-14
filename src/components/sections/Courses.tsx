@@ -28,22 +28,30 @@ export const Courses = () => {
       try {
         // Build query parameters
         const params = new URLSearchParams();
+        params.append('page', '0');
+        params.append('limit', '6');
+        
         if (selectedBoard && selectedBoard !== "all-boards") params.append('board', selectedBoard);
         if (selectedClass && selectedClass !== "all-classes") params.append('class', selectedClass);
         if (selectedSubject && selectedSubject !== "all-subjects") params.append('subject', selectedSubject);
         if (searchTerm) params.append('search', searchTerm);
-        
-        // Add limit for homepage
-        params.append('limit', '6');
-        params.append('page', '0');
         
         // Make API call
         const url = `${API_ENDPOINTS.courses.list}?${params.toString()}`;
         console.log("Fetching courses from:", url);
         
         const response = await apiGet(url, {
-          requiresAuth: true
+          skipAuthRedirect: true
         });
+        
+        if (!response.ok) {
+          console.error(`Error fetching courses: ${response.status}`);
+          if (response.status === 500) {
+            toast.error("Server error. Please try again later.");
+            return { isSuccess: false, data: [] };
+          }
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
           
         const responseData = await response.json();
         
@@ -53,16 +61,16 @@ export const Courses = () => {
           throw new Error(responseData?.error || "Failed to load courses");
         }
         
-        return responseData.data || [];
+        return Array.isArray(responseData.data) ? responseData.data : [];
       } catch (error) {
         console.error("Error in query function:", error);
-        throw error; // Let react-query handle the error
+        // Return an empty array instead of throwing to prevent app crash
+        return [];
       }
     },
     retry: 1,
     retryDelay: 1000,
     refetchOnWindowFocus: false,
-    // Removed useErrorBoundary property as it's not supported in this version
   });
 
   // Extract courses safely - ensure it's an array
@@ -126,7 +134,7 @@ export const Courses = () => {
               <SelectContent>
                 <SelectItem value="all-boards">All Boards</SelectItem>
                 {boards.map(board => (
-                  <SelectItem key={board} value={board.toLowerCase()}>{board}</SelectItem>
+                  <SelectItem key={board} value={board}>{board}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

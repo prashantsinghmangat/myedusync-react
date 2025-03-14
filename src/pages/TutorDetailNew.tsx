@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from "@/components/Header";
@@ -161,6 +162,13 @@ const TutorDetailNew = () => {
 
   // Check if there was an error or if the tutor was not found
   const showErrorUI = error || (tutorResponse && !tutorResponse.isSuccess);
+
+  // Format date function
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'Present';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+  };
 
   if (showErrorUI) {
     return (
@@ -432,7 +440,7 @@ const TutorDetailNew = () => {
                                     {edu.courseName}, {edu.fieldOfStudy}
                                   </div>
                                   <div className="text-sm text-gray-500 dark:text-gray-500 mb-2">
-                                    {edu.startTime} - {edu.endTime || 'Present'}
+                                    {formatDate(edu.startTime)} - {edu.endTime ? formatDate(edu.endTime) : 'Present'}
                                   </div>
                                   {edu.grade && (
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -489,7 +497,7 @@ const TutorDetailNew = () => {
                                     {exp.designation} • {exp.type}
                                   </div>
                                   <div className="text-sm text-gray-500 dark:text-gray-500">
-                                    {exp.startTime} - {exp.endTime || 'Present'}
+                                    {formatDate(exp.startTime)} - {exp.endTime ? formatDate(exp.endTime) : 'Present'}
                                   </div>
                                 </div>
                               ))}
