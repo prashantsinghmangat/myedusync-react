@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { LoadingProvider } from '@/providers/LoadingProvider';
 import { Toaster } from "@/components/ui/sonner";
+import { ScrollToTop } from '@/components/ScrollToTop';
 import Notes from './pages/Notes';
 import About from './pages/About';
 import Blog from './pages/Blog';
@@ -21,7 +23,6 @@ import BecomeTutor from './pages/BecomeTutor';
 import FindTutorSteps from './pages/FindTutorSteps';
 import FindTutor from './pages/FindTutor';
 import TutorDetail from './pages/TutorDetail';
-import TutorDetailNew from "@/pages/TutorDetailNew";
 import Contact from './pages/Contact';
 import StudentDashboard from './pages/student/Dashboard';
 import StudentProfile from './pages/student/Profile';
@@ -33,6 +34,7 @@ const App = () => {
     <HelmetProvider>
       <ThemeProvider defaultTheme="light" storageKey="app-theme">
         <LoadingProvider>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<About />} />
@@ -50,7 +52,6 @@ const App = () => {
             <Route path="/find-tutor-steps" element={<FindTutorSteps />} />
             <Route path="/find-tutor" element={<FindTutor />} />
             <Route path="/tutor/:id" element={<TutorDetail />} />
-            <Route path="/tutor-new/:id?" element={<TutorDetailNew />} />
             <Route path="/contact" element={<Contact />} />
             
             {/* Student Routes */}
