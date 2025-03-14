@@ -71,30 +71,6 @@ const TutorDetail = () => {
           toast.error("Failed to load tutor profile");
         }
         
-        // Fetch education
-        const educationResponse = await apiGet(API_ENDPOINTS.tutors.educationList);
-        const educationData = await educationResponse.json();
-        
-        if (educationData && educationData.data) {
-          // Filter education for this tutor
-          const tutorEducation = educationData.data.filter(
-            (edu: Education) => edu.teacherId === id
-          );
-          setEducation(tutorEducation);
-        }
-        
-        // Fetch experience
-        const experienceResponse = await apiGet(API_ENDPOINTS.tutors.experienceList);
-        const experienceData = await experienceResponse.json();
-        
-        if (experienceData && experienceData.data) {
-          // Filter experience for this tutor
-          const tutorExperience = experienceData.data.filter(
-            (exp: Experience) => exp.teacherId === id
-          );
-          setExperience(tutorExperience);
-        }
-        
       } catch (error) {
         console.error("Error fetching tutor data:", error);
         toast.error("Error loading tutor details. Please try again.");
