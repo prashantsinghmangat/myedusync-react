@@ -1,9 +1,18 @@
 
 import { useState } from "react";
 
-type TabValue = "about" | "education" | "experience" | "courses" | "offerings" | "security";
+export type TabValue = "about" | "education" | "experience" | "courses" | "offerings" | "security";
 
-export function useProfileTabs(defaultTab: TabValue = "about") {
+interface UseProfileTabsOptions {
+  defaultTab?: TabValue;
+}
+
+interface UseProfileTabsResult {
+  activeTab: TabValue;
+  setActiveTab: (tab: TabValue | string) => void;
+}
+
+export function useProfileTabs({ defaultTab = "about" }: UseProfileTabsOptions = {}): UseProfileTabsResult {
   const [activeTab, setActiveTab] = useState<TabValue>(defaultTab);
   
   const handleTabChange = (value: string) => {
