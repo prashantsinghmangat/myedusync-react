@@ -37,5 +37,11 @@ export const API_ENDPOINTS = {
     register: `${API_BASE_URL}/register`,
     profile: `${API_BASE_URL}/profile`,
     verifyOtp: `${API_BASE_URL}/verifyOtp`, 
+  },
+  blog: {
+    list: `${API_BASE_URL}/blogs`,
+    detail: (id: string) => `${API_BASE_URL}/blogs/${id}`,
+    byTag: (tag: string) => `${API_BASE_URL}/blogs/tag/${tag}`,
+    byAuthor: (authorId: string) => `${API_BASE_URL}/blogs/author/${authorId}`,
   }
 };

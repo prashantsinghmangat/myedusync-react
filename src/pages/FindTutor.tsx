@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Star, Filter, Grid, List, Phone } from "lucide-react";
 import { generateStructuredData } from "@/utils/seo";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const FindTutor = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,8 +23,6 @@ const FindTutor = () => {
   const [subject, setSubject] = useState(searchParams.get('subject') || 'all-subjects');
   const [classLevel, setClassLevel] = useState(searchParams.get('class') || 'all-classes');
   const [board, setBoard] = useState(searchParams.get('board') || 'all-boards');
-  const [mode, setMode] = useState(searchParams.get('mode') || 'all-modes');
-  const [location, setLocation] = useState(searchParams.get('location') || 'all-locations');
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '0'));
@@ -55,11 +54,11 @@ const FindTutor = () => {
     let desc = 'Find your perfect private tutor and arrange a Free Video Meeting. Then book one-to-one Online Lessons to fit your schedule.';
     if (subject && subject !== 'all-subjects') {
       desc = `Find qualified ${subject} tutors`;
-      if (location && location !== 'all-locations') {
-        desc += ` in ${location}`;
+      if (classLevel && classLevel !== 'all-classes') {
+        desc += ` for Class ${classLevel} students`;
       }
-      if (mode && mode !== 'all-modes') {
-        desc += ` for ${mode.toLowerCase()} lessons`;
+      if (board && board !== 'all-boards') {
+        desc += ` following ${board} curriculum`;
       }
       desc += '. Book a free consultation today!';
     }
@@ -76,7 +75,7 @@ const FindTutor = () => {
       url: 'https://myedusync.com'
     },
     serviceType: 'Tutoring Service',
-    areaServed: location && location !== 'all-locations' ? location : 'India'
+    areaServed: 'India'
   });
 
   useEffect(() => {
@@ -90,8 +89,6 @@ const FindTutor = () => {
         if (subject && subject !== 'all-subjects') params.append('subject', subject);
         if (classLevel && classLevel !== 'all-classes') params.append('class', classLevel);
         if (board && board !== 'all-boards') params.append('board', board);
-        if (mode && mode !== 'all-modes') params.append('mode', mode);
-        if (location && location !== 'all-locations') params.append('location', location);
         
         // Add pagination params
         params.append('page', currentPage.toString());
@@ -132,7 +129,7 @@ const FindTutor = () => {
     };
 
     fetchTutors();
-  }, [subject, classLevel, board, mode, location, currentPage, setIsLoading]);
+  }, [subject, classLevel, board, currentPage, setIsLoading]);
 
   // Apply filters and update URL
   const applyFilters = () => {
@@ -140,8 +137,6 @@ const FindTutor = () => {
     if (subject && subject !== 'all-subjects') params.append('subject', subject);
     if (classLevel && classLevel !== 'all-classes') params.append('class', classLevel);
     if (board && board !== 'all-boards') params.append('board', board);
-    if (mode && mode !== 'all-modes') params.append('mode', mode);
-    if (location && location !== 'all-locations') params.append('location', location);
     
     // Reset page to 0 when filters change
     setCurrentPage(0);
@@ -156,8 +151,6 @@ const FindTutor = () => {
     setSubject('all-subjects');
     setClassLevel('all-classes');
     setBoard('all-boards');
-    setMode('all-modes');
-    setLocation('all-locations');
     setCurrentPage(0);
     setSearchParams({});
   };
@@ -170,6 +163,11 @@ const FindTutor = () => {
     params.set('page', page.toString());
     setSearchParams(params);
   };
+
+  // Available options
+  const subjects = ["Mathematics", "Physics", "Chemistry", "Biology", "English", "Hindi", "Geography", "History"];
+  const classes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+  const boards = ["CBSE", "ICSE", "IB", "State Board"];
 
   return (
     <>
@@ -211,78 +209,94 @@ const FindTutor = () => {
             {/* Filters */}
             <div className="mb-8">
               {/* Desktop Filters */}
-              <div className="hidden lg:grid grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
+              <div className="hidden lg:grid grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
                 <div className="col-span-1">
                   <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Subject</label>
-                  <TutorFilters.Select 
-                    value={subject}
-                    onChange={(val) => setSubject(val)}
-                    options={[
-                      { value: 'all-subjects', label: 'All subjects' },
-                      { value: 'Mathematics', label: 'Mathematics' },
-                      { value: 'Physics', label: 'Physics' },
-                      { value: 'Chemistry', label: 'Chemistry' },
-                      // ... keep other subjects
-                    ]}
-                    placeholder="Select subject"
-                  />
+                  <Select 
+                    value={subject} 
+                    onValueChange={setSubject}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select subject" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all-subjects">All subjects</SelectItem>
+                      {subjects.map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="col-span-1">
                   <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Class Level</label>
-                  <TutorFilters.Select 
+                  <Select 
                     value={classLevel}
-                    onChange={(val) => setClassLevel(val)}
-                    options={[
-                      { value: 'all-classes', label: 'All levels' },
-                      // ... keep class options
-                    ]}
-                    placeholder="Select class"
-                  />
+                    onValueChange={setClassLevel}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all-classes">All levels</SelectItem>
+                      {classes.map(c => (
+                        <SelectItem key={c} value={c}>Class {c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="col-span-1">
-                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Price</label>
-                  <TutorFilters.Select 
-                    value="all-prices" 
-                    onChange={() => {}}
-                    options={[
-                      { value: 'all-prices', label: 'All prices' },
-                      { value: 'under-500', label: 'Under ₹500/hr' },
-                      { value: '500-1000', label: '₹500-₹1000/hr' },
-                      { value: 'over-1000', label: 'Over ₹1000/hr' }
-                    ]}
-                    placeholder="Select price range"
-                  />
+                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Board</label>
+                  <Select 
+                    value={board} 
+                    onValueChange={setBoard}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select board" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all-boards">All boards</SelectItem>
+                      {boards.map(b => (
+                        <SelectItem key={b} value={b}>{b}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
-                <div className="col-span-2 lg:col-span-1 flex items-end gap-2">
-                  <Button variant="outline" className="w-full" onClick={() => setIsFilterOpen(true)}>
-                    <Filter className="h-4 w-4 mr-2" />
-                    More filters
-                  </Button>
-                  <Button variant="outline" className="w-full" onClick={resetFilters}>
-                    Clear filters
-                  </Button>
-                </div>
-                
-                <div className="col-span-3 lg:col-span-1 flex items-end justify-end gap-2">
+                <div className="col-span-3 lg:col-span-1 flex items-end justify-between gap-2">
                   <Button 
-                    variant={viewMode === 'grid' ? 'default' : 'outline'} 
-                    size="icon"
-                    onClick={() => setViewMode('grid')}
-                    className="h-9 w-9"
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={applyFilters}
                   >
-                    <Grid className="h-4 w-4" />
+                    Apply
                   </Button>
                   <Button 
-                    variant={viewMode === 'list' ? 'default' : 'outline'} 
-                    size="icon"
-                    onClick={() => setViewMode('list')}
-                    className="h-9 w-9"
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={resetFilters}
                   >
-                    <List className="h-4 w-4" />
+                    Reset
                   </Button>
+                  <div className="flex items-center gap-1">
+                    <Button 
+                      variant={viewMode === 'grid' ? 'default' : 'outline'} 
+                      size="icon"
+                      onClick={() => setViewMode('grid')}
+                      className="h-9 w-9"
+                    >
+                      <Grid className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant={viewMode === 'list' ? 'default' : 'outline'} 
+                      size="icon"
+                      onClick={() => setViewMode('list')}
+                      className="h-9 w-9"
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
               
@@ -323,10 +337,6 @@ const FindTutor = () => {
                 setClassLevel={setClassLevel}
                 board={board}
                 setBoard={setBoard}
-                mode={mode}
-                setMode={setMode}
-                location={location}
-                setLocation={setLocation}
                 applyFilters={applyFilters}
                 resetFilters={resetFilters}
                 isFilterOpen={isFilterOpen}
