@@ -27,9 +27,9 @@ const NoteDetail = () => {
   // Fetch note details using API
   useEffect(() => {
     if (!id) return;
-    
+
     setNoteLoading(true);
-    
+
     apiGet(`${API_ENDPOINTS.notes.detail(id)}`, {
       requiresAuth: true
     })
@@ -37,7 +37,7 @@ const NoteDetail = () => {
       .then((data) => {
         if (data.isSuccess && data.data) {
           setNote(data.data);
-          
+
           // After we get the note, fetch related notes
           fetchRelatedNotes(data.data);
         } else {
@@ -58,27 +58,27 @@ const NoteDetail = () => {
   // Fetch related notes based on current note's attributes
   const fetchRelatedNotes = (currentNote: Note) => {
     setRecentNotesLoading(true);
-    
+
     const queryParams = new URLSearchParams();
     queryParams.append('page', '0');
     queryParams.append('limit', '5');
-    
+
     // Add filters based on the current note's attributes
     if (currentNote.notesBoard) {
       queryParams.append('board', currentNote.notesBoard);
     }
-    
+
     if (currentNote.notesClass) {
       queryParams.append('class', currentNote.notesClass);
     }
-    
+
     if (currentNote.notesSubject) {
       queryParams.append('subject', currentNote.notesSubject);
     }
-    
+
     const url = `${API_ENDPOINTS.notes.list}?${queryParams.toString()}`;
     console.log("Fetching related notes from:", url);
-    
+
     apiGet(url, { requiresAuth: true })
       .then((res) => res.json())
       .then((data) => {
@@ -86,7 +86,7 @@ const NoteDetail = () => {
         const filteredNotes = (data.data || []).filter(
           (relatedNote: Note) => relatedNote._id !== currentNote._id
         );
-        
+
         if (filteredNotes.length > 0) {
           setRecentNotes(filteredNotes);
         } else {
@@ -106,7 +106,7 @@ const NoteDetail = () => {
   // Fetch general recent notes when no specific filters are available
   const fetchRecentNotes = () => {
     setRecentNotesLoading(true);
-    
+
     apiGet(`${API_ENDPOINTS.notes.list}?page=0&limit=5`, {
       requiresAuth: true
     })
@@ -129,7 +129,7 @@ const NoteDetail = () => {
   // Generate structured data for SEO
   const generateNoteStructuredData = () => {
     if (!note) return null;
-    
+
     return generateStructuredData('Article', {
       headline: note.title,
       description: `${note.notesSubject} notes for ${note.notesClass} students from ${note.notesBoard} board`,
@@ -171,8 +171,8 @@ const NoteDetail = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <SEO 
-        title={note?.title || "Note Details"} 
+      <SEO
+        title={note?.title || "Note Details"}
         description={note ? `${note.notesSubject} notes for ${note.notesClass} students from ${note.notesBoard} board` : "Educational notes on various subjects"}
         structuredData={generateNoteStructuredData()}
       />
@@ -239,13 +239,22 @@ const NoteDetail = () => {
                     <Separator />
 
                     {/* Note Content */}
-                    <div>
+                    <section>
+                      <h3 className="text-lg font-semibold text-gray-800 mb-6">Content</h3>
+                      <div className="my-6">
+                        <div
+                          className="prose prose-lg max-w-none break-words text-gray-700 leading-loose p-8 bg-white rounded-lg shadow-sm border border-gray-100"
+                          dangerouslySetInnerHTML={{ __html: note.body || "" }}
+                        />
+                      </div>
+                    </section>
+                    {/* <div>
                       <h3 className="text-lg font-semibold mb-4">Content</h3>
                       <div
                         className="prose prose-lg max-w-none break-words"
                         dangerouslySetInnerHTML={{ __html: note.body || "" }}
                       />
-                    </div>
+                    </div> */}
 
                     <Separator />
 
@@ -322,19 +331,19 @@ const NoteDetail = () => {
               <div className="space-y-2">
                 {note?.notesBoard && (
                   <p className="text-gray-700 cursor-pointer hover:text-primary"
-                     onClick={() => navigate(`/notes?board=${note.notesBoard}`)}>
+                    onClick={() => navigate(`/notes?board=${note.notesBoard}`)}>
                     📘 {note.notesBoard} Board Notes
                   </p>
                 )}
                 {note?.notesClass && (
                   <p className="text-gray-700 cursor-pointer hover:text-primary"
-                     onClick={() => navigate(`/notes?class=${note.notesClass}`)}>
+                    onClick={() => navigate(`/notes?class=${note.notesClass}`)}>
                     📗 Class {note.notesClass} Notes
                   </p>
                 )}
                 {note?.notesSubject && (
                   <p className="text-gray-700 cursor-pointer hover:text-primary"
-                     onClick={() => navigate(`/notes?subject=${note.notesSubject}`)}>
+                    onClick={() => navigate(`/notes?subject=${note.notesSubject}`)}>
                     📙 {note.notesSubject} Notes
                   </p>
                 )}
