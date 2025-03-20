@@ -29,10 +29,6 @@ interface TutorFiltersProps {
   setClassLevel: (classLevel: string) => void;
   board: string;
   setBoard: (board: string) => void;
-  mode: string;
-  setMode: (mode: string) => void;
-  location: string;
-  setLocation: (location: string) => void;
   applyFilters: () => void;
   resetFilters: () => void;
   isFilterOpen: boolean;
@@ -95,10 +91,6 @@ export const TutorFilters = ({
   setClassLevel,
   board,
   setBoard,
-  mode,
-  setMode,
-  location,
-  setLocation,
   applyFilters,
   resetFilters,
   isFilterOpen,
@@ -108,8 +100,6 @@ export const TutorFilters = ({
   const subjects = ["Mathematics", "Physics", "Chemistry", "Biology", "English", "Hindi", "Geography", "History"];
   const classes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
   const boards = ["CBSE", "ICSE", "IB", "State Board"];
-  const modes = ["Online", "Offline", "Hybrid"];
-  const locations = ["Delhi", "Mumbai", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Pune", "India"];
 
   // Create option arrays for the custom select
   const subjectOptions = [
@@ -125,16 +115,6 @@ export const TutorFilters = ({
   const boardOptions = [
     { value: 'all-boards', label: 'All Boards' },
     ...boards.map(b => ({ value: b, label: b }))
-  ];
-  
-  const modeOptions = [
-    { value: 'all-modes', label: 'All Modes' },
-    ...modes.map(m => ({ value: m, label: m }))
-  ];
-  
-  const locationOptions = [
-    { value: 'all-locations', label: 'All Locations' },
-    ...locations.map(l => ({ value: l, label: l }))
   ];
 
   return (
@@ -190,36 +170,6 @@ export const TutorFilters = ({
                 </SelectContent>
               </Select>
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Mode</label>
-              <Select value={mode} onValueChange={setMode}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select mode" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all-modes">All Modes</SelectItem>
-                  {modes.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Location</label>
-              <Select value={location} onValueChange={setLocation}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all-locations">All Locations</SelectItem>
-                  {locations.map((l) => (
-                    <SelectItem key={l} value={l}>{l}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
           
           <div className="flex flex-col space-y-2 mt-4">
@@ -234,7 +184,7 @@ export const TutorFilters = ({
       </Sheet>
       
       {/* Active filters display */}
-      {(subject !== 'all-subjects' || classLevel !== 'all-classes' || board !== 'all-boards' || mode !== 'all-modes' || location !== 'all-locations') && (
+      {(subject !== 'all-subjects' || classLevel !== 'all-classes' || board !== 'all-boards') && (
         <div className="flex flex-wrap gap-2 mt-4">
           {subject && subject !== "all-subjects" && (
             <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
@@ -256,22 +206,6 @@ export const TutorFilters = ({
             <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
               Board: {board}
               <button onClick={() => setBoard('all-boards')} className="ml-1 focus:outline-none">
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          )}
-          {mode && mode !== "all-modes" && (
-            <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
-              Mode: {mode}
-              <button onClick={() => setMode('all-modes')} className="ml-1 focus:outline-none">
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          )}
-          {location && location !== "all-locations" && (
-            <div className="inline-flex items-center bg-accent/10 text-accent rounded-full px-3 py-1 text-sm">
-              Location: {location}
-              <button onClick={() => setLocation('all-locations')} className="ml-1 focus:outline-none">
                 <X className="h-3 w-3" />
               </button>
             </div>
